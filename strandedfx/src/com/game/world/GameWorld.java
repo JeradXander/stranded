@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 
 public class GameWorld {
-    private static String currentLocation = "Crash Site";
+    public static String currentLocation = "Crash Site";
     private static String previousLocation = "Crash Site";
 
     //Fields for Game Assets

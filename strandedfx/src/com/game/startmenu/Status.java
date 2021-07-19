@@ -173,6 +173,46 @@ public class Status {
 
     }
 
+    //method to send info to javafx
+    public static HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
+        HashMap<String, String> fxLocationHMap = new HashMap<>();
+        String currentLoc = GameWorld.getCurrentLocation();
+        if (currentLoc == null || currentLoc.equals("")) {
+            currentLoc = GameWorld.getPreviousLocation();
+        }
+        Combat combat = null;
+        if (currentLoc.contains("Alien Compound")) {
+            combat = new Combat();
+        }
+        Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
+
+        System.out.println("===================================================");
+        System.out.println("Location: " + currentLocData.getName());
+        System.out.println("===================================================");
+        System.out.println("Description: " +  currentLocData.getDescription());
+        System.out.println("\n");
+        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
+        System.out.println("===================================================");
+        fxLocationHMap.put("Location", currentLocData.getName());
+        fxLocationHMap.put("Description", currentLocData.getDescription());
+        fxLocationHMap.put("Items", GameWorld.getItemsByLocation(currentLoc).toString());
+        //System.out.println("Last action taken: " + getAction() + " "+ getNoun());
+        //System.out.println(getResult()); //Display action results
+        //setResult(""); //Reset action results for next action
+        return fxLocationHMap;
+
+    }
+
+    public static HashMap<String, Integer> fxDisplayPlayer() throws InterruptedException, IOException {
+        HashMap<String, Integer> fxPlayerHMap = new HashMap<>();
+        System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+        fxPlayerHMap.put("HP", Player.getHP());
+        fxPlayerHMap.put("MaxHP", Player.getMaxHp());
+
+        return fxPlayerHMap;
+
+    }
+
     public static void clearConsole() throws InterruptedException {
         /* Code Attributed to DelftStack
             December 10, 2020
