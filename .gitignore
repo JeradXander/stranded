@@ -6,6 +6,7 @@ stranded.iml
 
 #Ignore out folder
 out/
+strandedfx/out/
 
 
 # Compiled class file
