@@ -29,7 +29,7 @@ public class Main {
             while (player == null) {
                 GameWorld ourGame = new GameWorld();
                 HashMap<String, Location> planet1 = ourGame.getPlanet1();
-                player = new Player();
+                player = new Player("dan", "explorer");
                 Run = true;
 
             }
@@ -99,7 +99,7 @@ public class Main {
             while (player == null) {
                 GameWorld ourGame = new GameWorld();
                 HashMap<String, Location> planet1 = ourGame.getPlanet1();
-                player = new Player();
+                player = new Player("Damian", "explorer");
                 Run = true;
 
             }

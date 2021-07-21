@@ -104,7 +104,7 @@ public class Game {
         StartMenu.entCont();
 
         //Clint's player test
-        Player player1 = new Player();
+        Player player1 = new Player("Clint", "medic");
 
 
     }

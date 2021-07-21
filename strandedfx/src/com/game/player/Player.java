@@ -16,18 +16,30 @@ public class Player {
     private static int defense;
     private static ArrayList<Item> inventory = new ArrayList<Item>();
     private static int movePenalty = -10;
+    private static String astronautClass = "medic";
+
 
     //Constant Fields
     private static final int MAX_HP = 100;
     private static final int MIN_HP = 0;
 
     //Player Constructor
-    public Player(){
-        setName();
+    public Player(String _name, String _astronautClass){
+        setName(_name);
         setHP(MAX_HP);
 //        setHP(85); //for testing
         setDefense(1);
+        setAstronautClass(_astronautClass);
     }
+
+    public static String getAstronautClass() {
+        return astronautClass;
+    }
+
+    public static void setAstronautClass(String astronautClass) {
+        Player.astronautClass = astronautClass;
+    }
+
     //Inventory methods will go below
     public static void addItem(Item item){
         inventory.add(item);
@@ -125,12 +137,12 @@ public class Player {
     }
 
     //Getters & Setters
-    public static String getName(){
+    public String getName(){
         return name;
     }
 
-    public void setName(){
-        name = UserInput.setPlayerName();
+    public void setName(String _name){
+        name = _name;
         System.out.println("Welcome aboard Commander " + name + "!");
     }
 
@@ -152,6 +164,7 @@ public class Player {
         }
 
     }
+
 
     public static int getMaxHp() {
         return MAX_HP;

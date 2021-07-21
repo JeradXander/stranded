@@ -1,5 +1,6 @@
 package sample;
 
+import com.game.player.Player;
 import com.game.startmenu.Status;
 import com.game.world.GameWorld;
 import com.game.world.Location;
@@ -8,9 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -29,13 +28,20 @@ public class Controller {
     private Scene scene;
     private Parent root;
     public TextField playerName;
+    @FXML
     public Label displayAstroName;
+    public ToggleGroup astroGroup;
     @FXML
     public Label fxCurrentLocation;
     @FXML
     public Label fxDescription;
     @FXML
     Button sendCommand;
+    @FXML
+    public Label hp;
+    @FXML
+    public Label maxHP;
+
 
     GameWorld ourGame = new GameWorld();
     HashMap<String, Location> planet1 = ourGame.getPlanet1();
@@ -47,21 +53,25 @@ public class Controller {
 
 
     public void switchToStartGame(ActionEvent event) throws IOException, InterruptedException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("playScreen.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("./playScreen.fxml")));
         stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         stage.setTitle(currentLocation);
 
-        submitName(event);
+        Player  playa = submitName(event);
         scene = new Scene(root);
         stage.setScene(scene);
+
+        displayAstroName.setText("dffsagsdfgsdfg");
+
+        stage.showAndWait();
         //Label topCurrentLocation = new Label();
         //topCurrentLocation.setText(currentLocation);
         //System.out.println(topCurrentLocation);
-        stage.show();
+        //stage.showAndWait();
         //fxCurrentLocation.setText(currentLocation);
         //System.out.println(fxCurrentLocation.toString());
-
-
+       // startGameToFX();
+        runningGame(stage, playa, ourGame);
     }
 
     public void startGameToFX() throws IOException, InterruptedException {
@@ -78,6 +88,15 @@ public class Controller {
         HashMap<String, Integer> fxPlayerHP = fxDisplayPlayer();
 
     }
+    private void runningGame(Stage stage ,Player player, GameWorld gameWorld){
+
+
+
+
+
+        displayAstroName.setText("dsbwehbwhbrttnhrwehntrewhntertnhrewthnerhnterhntren");
+
+    }
 
 
 
@@ -88,14 +107,23 @@ public class Controller {
 //        Main startMain = new Main();
 //        startMain();
 //    }
-    public String submitName(ActionEvent event){
+    public Player  submitName(ActionEvent event){
         String name = playerName.getText();
         System.out.println("Player name is " + name);
+
+        RadioButton radioButton = (RadioButton) astroGroup.getSelectedToggle();
+        String astroGroup = radioButton.getText();
+        System.out.println(astroGroup);
+
+        Player pley = new Player(name,astroGroup);
+
+        return pley;
 //        displayAstroName.setText(name);
-    return name;
     }
 
     //Method that creates a new stage/scene that displays the travel ascii
 
+    public void checkRadioButtons(){
 
+    }
 }

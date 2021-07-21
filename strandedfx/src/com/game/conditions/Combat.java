@@ -102,18 +102,18 @@ public class Combat {
     private void fightStatus(Alien soldier) throws InterruptedException {
         Status.clearConsole();
 
-        System.out.println("**********ALERT, ALIEN IS ATTACKING YOU*************");
-        System.out.println("===================================================");
-        System.out.println("Enemy: " + soldier.getType() + " HP: " + soldier.getHp());
-        System.out.println("===================================================");
-        System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
-        System.out.println("Weapons available: fists " + Player.viewInventory("weapon"));
-        System.out.println("---------------------------------------------------");
-        System.out.println("Last action taken: " + getVerb() + " "+ getNoun());
-        System.out.println(">" + getResult());
-        System.out.println(">" + getEnemyResult());
-        Combat.setResult("");
-        Combat.setEnemyResult("");
+//        System.out.println("**********ALERT, ALIEN IS ATTACKING YOU*************");
+//        System.out.println("===================================================");
+//        System.out.println("Enemy: " + soldier.getType() + " HP: " + soldier.getHp());
+//        System.out.println("===================================================");
+//        System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+//        System.out.println("Weapons available: fists " + Player.viewInventory("weapon"));
+//        System.out.println("---------------------------------------------------");
+//        System.out.println("Last action taken: " + getVerb() + " "+ getNoun());
+//        System.out.println(">" + getResult());
+//        System.out.println(">" + getEnemyResult());
+//        Combat.setResult("");
+//        Combat.setEnemyResult("");
 
     }
 
