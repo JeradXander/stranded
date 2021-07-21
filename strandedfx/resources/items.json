@@ -80,6 +80,51 @@
 		"location": "Alien Compound 2",
 		"description": "Some strange goop that aliens were eating.  Might be ok to try ",
 		"keyItem": false
+	},
+	{
+		"id": 40,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 41,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 42,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 43,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 44,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
 	}
 
 
