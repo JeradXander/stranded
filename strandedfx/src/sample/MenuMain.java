@@ -16,7 +16,7 @@ public class MenuMain extends Application {
 
     @Override
     public void start(Stage menuStage) throws Exception{
-        music();
+       // music();
         ViewManager manager = new ViewManager();
         menuStage = manager.getMainStage();
        // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
