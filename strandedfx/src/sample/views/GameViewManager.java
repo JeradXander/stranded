@@ -2,11 +2,9 @@ package sample.views;
 
 import com.game.player.Player;
 import java.util.ArrayList;
-
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -16,7 +14,12 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import sample.MenuMain;
@@ -27,7 +30,7 @@ import sample.models.StrandedButton;
 import sample.models.StrandedSubScene;
 
 
-public class ViewManager {
+public class GameViewManager {
 
     private static final int HEIGHT = 775;
     private static final int WIDTH = 1050;
@@ -53,7 +56,7 @@ public class ViewManager {
     private Stage mainStage;
 
 
-    public ViewManager(){
+    public GameViewManager(Player playerCreated){
         buttonList = new ArrayList<>();
         //creating main window to hold all children
         mainPane = new AnchorPane();
@@ -64,22 +67,24 @@ public class ViewManager {
 
         mainStage.setResizable(false);
 
+        mainStage.setTitle(playerCreated.getName() + "special: " );
+
         createSubscenes();
-
-        //creating buttons
-        createButton();
-
-        //creating Background from method
-        createBackGround();
-
-        createLogo();
-
-        createSlider();
-
-        createchooseSubscene();
-
-        StrandedSubScene subscene = new StrandedSubScene();
-        mainPane.getChildren().add(subscene);
+//
+////        //creating buttons
+////        createButton();
+//
+//        //creating Background from method
+//        createBackGround();
+//
+//        createLogo();
+//
+//        createSlider();
+//
+//        createchooseSubscene();
+//
+//        StrandedSubScene subscene = new StrandedSubScene();
+//        mainPane.getChildren().add(subscene);
     }
 
     //method to get main stage
@@ -91,19 +96,17 @@ public class ViewManager {
         creditSubscene = new StrandedSubScene();
         mainPane.getChildren().add(creditSubscene);
 
-        helpSubscene = new StrandedSubScene();
-        mainPane.getChildren().add(helpSubscene);
-
-        playSubscene = new StrandedSubScene();
-        mainPane.getChildren().add(playSubscene);
-
-        scoreSubscene = new StrandedSubScene();
-        mainPane.getChildren().add(scoreSubscene);
+//        helpSubscene = new StrandedSubScene();
+//        mainPane.getChildren().add(helpSubscene);
+//
+//        playSubscene = new StrandedSubScene();
+//        mainPane.getChildren().add(playSubscene);
+//
+//        scoreSubscene = new StrandedSubScene();
+//        mainPane.getChildren().add(scoreSubscene);
 
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
-
-
 
     }
 
@@ -140,12 +143,6 @@ public class ViewManager {
             public void handle(MouseEvent mouseEvent) {
                 System.out.println("clicked");
 
-                GameViewManager manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
-                mainStage = manager.getMainStage();
-                // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
-//                mainStage.setTitle("GameView");
-
-                mainStage.show();
             }
         });
     }
@@ -160,7 +157,6 @@ public class ViewManager {
             AstroPicker astroToPick = new AstroPicker(astro);
             astroList.add(astroToPick);
             box.getChildren().add(astroToPick);
-            chosenAstro = astroToPick.getAstro();
 
             astroToPick.setOnMouseClicked(mouseEvent -> {
                 for(AstroPicker astros : astroList){
@@ -195,7 +191,7 @@ public class ViewManager {
 
     private void createButton(){
 
-        createPlayButton();
+//        createPlayButton();
         createScoreButton();
         createHelpButton();
         createCreditsButton();
