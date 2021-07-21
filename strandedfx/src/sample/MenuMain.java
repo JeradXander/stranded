@@ -36,13 +36,13 @@ public class MenuMain extends Application {
     }
     public static MediaPlayer mediaPlayer;
     public void music() {
-        String s = "src/music/intro.wav";
-        String path = Paths.get(s).toUri().toString();
-        System.out.println(path);
-        Media h = new Media(path);
+       // String s = "src/sample/views/resources/intro.wav";
+       // String path = Paths.get(s).toUri().toString();
+        String respath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("intro.wav")).toExternalForm();
+        System.out.println(respath);
+        Media h = new Media(respath);
         mediaPlayer = new MediaPlayer(h);
         mediaPlayer.play();
-
     }
 
 

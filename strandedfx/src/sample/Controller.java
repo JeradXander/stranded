@@ -53,7 +53,7 @@ public class Controller {
 
 
     public void switchToStartGame(ActionEvent event) throws IOException, InterruptedException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("playScreen.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("./playScreen.fxml")));
         stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         stage.setTitle(currentLocation);
 
