@@ -2,6 +2,7 @@ package com.game;
 
 import com.game.conditions.Travel;
 import com.game.conditions.Win;
+import com.game.items.Item;
 import com.game.player.Player;
 import com.game.startmenu.StartMenu;
 import com.game.startmenu.Status;
@@ -10,6 +11,7 @@ import com.game.world.Location;
 import com.game.conditions.Lose;
 import com.game.textparser.UserInput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -29,7 +31,17 @@ public class Main {
             while (player == null) {
                 GameWorld ourGame = new GameWorld();
                 HashMap<String, Location> planet1 = ourGame.getPlanet1();
-                player = new Player("dan", "explorer");
+                player = new Player("dan", "Medic");
+                if (Player.getAstronautClass().equals("Medic")){
+                    //Player.addItem(Item med-pack);
+                    Location medpacks = planet1.get("Starting Items");
+                    Player.move("Starting Items");
+                    status.action(new String[] {"grab", "med-pack"});
+
+                    System.out.println("As the medic you start out with five med-packs!");
+                    Player.move("Crash Site");
+                    Player.setHP(100);
+                }
                 Run = true;
 
             }

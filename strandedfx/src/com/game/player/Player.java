@@ -1,11 +1,18 @@
 package com.game.player;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.conditions.Combat;
 import com.game.enemies.Alien;
 import com.game.items.Item;
 import com.game.textparser.UserInput;
 import com.game.world.GameWorld;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Player {
@@ -14,9 +21,10 @@ public class Player {
     private static String name;
     private static int HP;
     private static int defense;
+    private static int attack;
     private static ArrayList<Item> inventory = new ArrayList<Item>();
     private static int movePenalty = -10;
-    private static String astronautClass = "medic";
+    public static String astronautClass = "Medic";
 
 
     //Constant Fields
@@ -31,6 +39,8 @@ public class Player {
         setDefense(1);
         setAstronautClass(_astronautClass);
     }
+
+
 
     public static String getAstronautClass() {
         return astronautClass;
@@ -94,6 +104,7 @@ public class Player {
     // Player manipulation methods
     public static void move(String nextLoc) {
         //reduces HP for player movement & updates location
+
         setMovePenalty();  //readjust move penalty before moving
 
         setHP(getMovePenalty());
@@ -105,19 +116,23 @@ public class Player {
         //Attack alien method!
         Random rand = new Random();
         int randDamage = 0;
-        int atkPower;
+        int atkPower = 0;
+
+        //check for Soldier Class
+        if(astronautClass.equals("Soldier")){
+            atkPower += 10;
+        }
 
         if (weapon == null ) {
-            atkPower = 2; //Hand combat power
+            atkPower += 2; //Hand combat power
             randDamage = rand.nextInt(atkPower)+1;
 
             alien.takeDamage(randDamage);
             Combat.setResult("Used your fists!");
-        }
-        else {
+        }else {
 
             if (weapon.getType().equals("weapon")) {
-                atkPower = weapon.getHpValue();
+                atkPower += weapon.getHpValue();
 
                 //Randomly generate damage amount greater than at least half the attack power
                 while (randDamage < (atkPower/2)) {
@@ -189,10 +204,13 @@ public class Player {
 
     private static void setMovePenalty() {
         //Set based on current player HP
-        if (getHP() < 50 ) {
+        if (getHP() < 50 && astronautClass.equals("Explorer") ) {
+            movePenalty = -2;
+        }else if(getHP() < 50){
             movePenalty = -5;
-        }
-        else {
+        }else if(astronautClass.equals("Explorer")){
+            movePenalty = -5;
+        }else {
             movePenalty = -10;
         }
     }

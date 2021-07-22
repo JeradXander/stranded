@@ -157,19 +157,20 @@ public class Status {
         }
         Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
 
-//        System.out.println("===================================================");
-//        System.out.println("Location: " + currentLocData.getName());
-//        System.out.println("===================================================");
-//        System.out.println("Description: " +  currentLocData.getDescription());
-//        System.out.println("\n");
-//        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
-//        System.out.println("===================================================");
-//        System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
-//        System.out.println("Current Inventory: " + Player.viewInventory());
-//        System.out.println("---------------------------------------------------");
-//        System.out.println("Last action taken: " + getAction() + " "+ getNoun());
-//        System.out.println(getResult()); //Display action results
-//        setResult(""); //Reset action results for next action
+        System.out.println("===================================================");
+        System.out.println("Location: " + currentLocData.getName());
+        System.out.println("===================================================");
+        System.out.println("Description: " +  currentLocData.getDescription());
+        System.out.println("\n");
+        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
+        System.out.println("===================================================");
+        System.out.println("Name: " + "dan" + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+        //Player.getName()
+        System.out.println("Current Inventory: " + Player.viewInventory());
+        System.out.println("---------------------------------------------------");
+        System.out.println("Last action taken: " + getAction() + " "+ getNoun());
+        System.out.println(getResult()); //Display action results
+        setResult(""); //Reset action results for next action
 
     }
 

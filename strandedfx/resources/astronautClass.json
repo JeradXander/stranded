@@ -1,0 +1,23 @@
+{
+  "Explorer": {
+    "movePenalty": -7,
+    "attack": 1,
+    "defense": 5,
+    "StartingItems": {},
+    "description": "Used to navigating dangerous terrain, the Explorer takes less damage for move around the map."
+  },
+  "Medic": {
+    "movePenalty": -10,
+    "attack": 1,
+    "defense": 5,
+    "StartingItems": {"med-pack": 5},
+    "description": "The Medic comes equipped with 5 med-packs that heal 10 health each."
+  },
+  "Soldier": {
+    "movePenalty": -10,
+    "attack": 10,
+    "defense": 10,
+    "StartingItems": {},
+    "description": "the Soldier deals more damage in combat."
+  }
+}

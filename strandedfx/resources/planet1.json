@@ -169,5 +169,14 @@
 		"east": "Dead Volcano",
 		"south": null,
 		"west": null
+	},
+	{
+		"locationId": 20,
+		"name": "Starting Items",
+		"description": "This is used to hold starting items, but keep them from showing up at the Crash site.",
+		"north": null,
+		"east": null,
+		"south": null,
+		"west": null
 	}
 ]
