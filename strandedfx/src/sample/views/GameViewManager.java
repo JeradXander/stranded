@@ -2,6 +2,7 @@ package sample.views;
 
 import com.game.player.Player;
 import java.util.ArrayList;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,15 +48,16 @@ public class GameViewManager {
     private StrandedSubScene scoreSubscene;
     private StrandedSubScene playSubscene;
     private StrandedSubScene astroChooserScene;
+    private StrandedSubScene mapSubscene;
 
-
+    private ImageView map;
 
 
     private AnchorPane mainPane;
     private Scene mainScene;
     private Stage mainStage;
 
-
+// Constructor
     public GameViewManager(Player playerCreated){
         buttonList = new ArrayList<>();
         //creating main window to hold all children
@@ -77,9 +79,12 @@ public class GameViewManager {
 //        //creating Background from method
         createBackGround();
 //
-        createLogo();
+        creatMapButton();
 //
-//        createSlider();
+        createSlider();
+
+        MenuMain.fxmediaPlayer.play();
+
 //
 //        createchooseSubscene();
 //
@@ -108,6 +113,9 @@ public class GameViewManager {
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
 
+        mapSubscene = new StrandedSubScene();
+        mainPane.getChildren().add(mapSubscene);
+
     }
 
     private void createSlider(){
@@ -117,13 +125,13 @@ public class GameViewManager {
         volumeControl.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number t1) {
-                MenuMain.mediaPlayer.setVolume(volumeControl.getValue() * 0.01);
+                MenuMain.fxmediaPlayer.setVolume(volumeControl.getValue() * 0.01);
 
                 System.out.println("volume" + volumeControl.getValue());
             }
         });
     }
-
+// Choose Astronaut
     private void createchooseSubscene(){
         astroChooserScene = new StrandedSubScene();
         InfoLabel astroLabel = new InfoLabel("CHOOSE ASTRO:\nLEFT: SOLDIER MIDDLE: MEDIC RIGHT: EXPLORER");
@@ -244,13 +252,14 @@ public class GameViewManager {
 //                primaryStage.setHeight(HEIGHT);
 //
 //                primaryStage.show();
-//                MenuMain.mediaPlayer.stop();
+//                MenuMain.gameMediaPlayer.stop();
             }
         });
 
 
     }
 
+//    score button main menu
     private void createScoreButton(){
         StrandedButton scoreButton = new StrandedButton("SCORE");
         addMenuButton(scoreButton);
@@ -274,6 +283,8 @@ public class GameViewManager {
         });
     }
 
+
+//    help button main menu
     private void createHelpButton(){
 
         StrandedButton helpButton = new StrandedButton("HELP");
@@ -295,6 +306,7 @@ public class GameViewManager {
         });
     }
 
+//    credit button main menu
     private void createCreditsButton(){
 
         StrandedButton credButton = new StrandedButton("CREDITS");
@@ -333,7 +345,7 @@ public class GameViewManager {
             }
         });
     }
-
+// Crashsite
     private void createBackGround(){
         Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
         BackgroundImage background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -342,29 +354,42 @@ public class GameViewManager {
         mainPane.setBackground(new Background(background));
     }
 
-    private void createLogo(){
-        ImageView logo = new ImageView("sample/views/resources/mapplaceholder.png");
-        logo.setLayoutX(775);
-        logo.setLayoutY(20);
-        logo.setFitWidth(250);
-        logo.setPreserveRatio(true);
+//    Map placeholder
+    private void creatMapButton(){
+        StrandedButton mapButton = new StrandedButton("MAP");
+        map = new ImageView("sample/models/resources/maps/crashSite.png");
+        map.setFitWidth(350);
+        map.setPreserveRatio(true);
+        map.setLayoutX(130);
+        map.setLayoutY(25);
+        mapButton.setLayoutX(250);
+        mapButton.setLayoutY(700);
+        mapSubscene.getAnchorPane().getChildren().add(mapButton);
+        mapSubscene.getAnchorPane().getChildren().add(map);
+        addMenuButton(mapButton);
 
-        logo.setOnMouseEntered(new EventHandler<MouseEvent>() {
+        mapButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+//                showAndHideSubscenes(mapSubscene);
+
+                if (!mapSubscene.isHidden()){
+                    mapSubscene.hideSubScene();
+                } else {
+                    mapSubscene.showSubScene();
+                }
+            }
+        });
+
+        mapButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 DropShadow dropshad = new DropShadow();
 
                 dropshad.setColor(Color.ORANGE);
-                logo.setEffect(dropshad);
+                mapButton.setEffect(dropshad);
             }
         });
-        logo.setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                logo.setEffect(null);
-            }
-        });
-        mainPane.getChildren().add(logo);
     }
 
     private void showAndHideSubscenes(StrandedSubScene subScene){
@@ -376,4 +401,5 @@ public class GameViewManager {
 
         sceneThatNeedsToSlide = subScene;
     }
+
 }
