@@ -1,0 +1,15 @@
+com\game\conditions\Win.class
+com\game\items\Item.class
+com\game\startmenu\StartMenu.class
+com\game\textparser\UserInput.class
+com\game\conditions\Combat.class
+com\game\Game.class
+com\game\Main.class
+com\game\player\Player.class
+com\game\conditions\Travel.class
+com\game\enemies\Alien.class
+com\game\startmenu\Status.class
+com\game\conditions\Lose.class
+com\game\textparser\Directions.class
+com\game\world\Location.class
+com\game\world\GameWorld.class
