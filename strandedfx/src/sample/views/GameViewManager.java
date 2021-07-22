@@ -70,14 +70,14 @@ public class GameViewManager {
         mainStage.setTitle(playerCreated.getName() + "special: " );
 
         createSubscenes();
-//
-////        //creating buttons
-////        createButton();
+
+        //creating buttons
+        createButton();
 //
 //        //creating Background from method
-//        createBackGround();
+        createBackGround();
 //
-//        createLogo();
+        createLogo();
 //
 //        createSlider();
 //
@@ -192,9 +192,9 @@ public class GameViewManager {
     private void createButton(){
 
 //        createPlayButton();
-        createScoreButton();
-        createHelpButton();
-        createCreditsButton();
+//        createScoreButton();
+//        createHelpButton();
+//        createCreditsButton();
         createExitButton();
     }
 
@@ -335,7 +335,7 @@ public class GameViewManager {
     }
 
     private void createBackGround(){
-        Image mainBackImage = new Image("sample/views/resources/mainBackground.png",1000,800,false,true);
+        Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
         BackgroundImage background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
                                                          BackgroundPosition.DEFAULT,null);
 
@@ -343,10 +343,10 @@ public class GameViewManager {
     }
 
     private void createLogo(){
-        ImageView logo = new ImageView("sample/views/resources/logo.png");
-        logo.setLayoutX(325);
+        ImageView logo = new ImageView("sample/views/resources/mapplaceholder.png");
+        logo.setLayoutX(775);
         logo.setLayoutY(20);
-        logo.setFitWidth(650);
+        logo.setFitWidth(250);
         logo.setPreserveRatio(true);
 
         logo.setOnMouseEntered(new EventHandler<MouseEvent>() {
