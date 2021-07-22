@@ -31,7 +31,7 @@ public class StrandedButton extends Button {
     }
 
     public void setButtonFontForLongText(){
-            setFont(Font.font("Courier New", FontWeight.BOLD, 23));
+            setFont(Font.font("Courier New", FontWeight.BOLD, 18));
     }
 
     private void setbuttonPressedStyle(){
