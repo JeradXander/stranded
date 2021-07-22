@@ -2,8 +2,16 @@ package com.game.enemies;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.conditions.Combat;
 import com.game.player.Player;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -76,12 +84,22 @@ public class Alien {
         return damage;
     }
 
-    public void takeDamage(int AttackStr) {
+    public void takeDamage(int AttackStr) throws IOException {
+        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        Map<String, ArrayList<String>> synonymMap = new HashMap<String, ArrayList<String>>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        synonymMap = objectMapper.readValue(mapData, HashMap.class);
+        String[] synArray = synonymMap.get("combat").toArray(new String[0]);
+        int synonymLength = synArray.length;
+        Random synRand = new Random();
+        int synSelector = synRand.nextInt(synonymLength);
+
         int totalDamage = AttackStr/defense;
         if (totalDamage == 0) { //Give at least 1 damage per turn with fists...
             totalDamage += 1;
         }
-        Combat.setResult(getType()+" took " + totalDamage + " damage!");
+        Combat.setResult(getType()+" took " + totalDamage + " damage! " + synArray[synSelector] + " attack!");
         setHp(-totalDamage);
     }
 

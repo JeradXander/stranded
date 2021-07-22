@@ -138,5 +138,21 @@
     "topple",
     "unload",
     "drop"
+  ],
+  "combat": [
+    "lethal",
+    "rough",
+    "savage",
+    "hard",
+    "fatal",
+    "dangerous",
+    "destructive",
+    "harmful",
+    "devastating",
+    "brutal",
+    "harsh",
+    "vicious",
+    "barbaric",
+    "fierce"
   ]
 }

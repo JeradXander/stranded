@@ -31,7 +31,7 @@ public class Main {
             while (player == null) {
                 GameWorld ourGame = new GameWorld();
                 HashMap<String, Location> planet1 = ourGame.getPlanet1();
-                player = new Player("dan", "Medic");
+                player = new Player("dan", "Soldier");
                 if (Player.getAstronautClass().equals("Medic")){
                     //Player.addItem(Item med-pack);
                     Location medpacks = planet1.get("Starting Items");
