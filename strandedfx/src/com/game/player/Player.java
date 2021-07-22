@@ -25,6 +25,7 @@ public class Player {
     private static ArrayList<Item> inventory = new ArrayList<Item>();
     private static int movePenalty = -10;
     public static String astronautClass = "Medic";
+    public static boolean firstCombat = true;
 
 
     //Constant Fields
@@ -112,37 +113,82 @@ public class Player {
     }
 
     //Fight Methods
-    public static void attack(Alien alien, Item weapon) {
+    public static void attack(Alien alien, Item weapon) throws IOException, InterruptedException {
         //Attack alien method!
+
+        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        Map<String, ArrayList<String>> synonymMap = new HashMap<String, ArrayList<String>>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        synonymMap = objectMapper.readValue(mapData, HashMap.class);
+        String[] synArray = synonymMap.get("combat").toArray(new String[0]);
+        int synonymLength = synArray.length;
+        Random synRand = new Random();
+        int synSelector = synRand.nextInt(synonymLength);
+
+
         Random rand = new Random();
         int randDamage = 0;
         int atkPower = 0;
 
         //check for Soldier Class
-        if(astronautClass.equals("Soldier")){
+        if(astronautClass.equals("Soldier") && firstCombat) {
+            System.out.println("You remember your training as a Soldier...");
+            Thread.sleep(1000);
+            firstCombat = false;
+        }
+
+
+            if(astronautClass.equals("Soldier")) {
             atkPower += 10;
-        }
 
-        if (weapon == null ) {
-            atkPower += 2; //Hand combat power
-            randDamage = rand.nextInt(atkPower)+1;
 
-            alien.takeDamage(randDamage);
-            Combat.setResult("Used your fists!");
-        }else {
+            if (weapon == null) {
+                atkPower += 2; //Hand combat power
+                randDamage = rand.nextInt(atkPower) + 1;
 
-            if (weapon.getType().equals("weapon")) {
-                atkPower += weapon.getHpValue();
-
-                //Randomly generate damage amount greater than at least half the attack power
-                while (randDamage < (atkPower/2)) {
-                    randDamage = rand.nextInt(atkPower)+1;
-                }
-
-                //Combat.setResult("You used your " + weapon.getItemName() + "!");
                 alien.takeDamage(randDamage);
+
+                Combat.setResult("Used your fists!" + " " + synArray[synSelector] + " attack!");
+
+            } else {
+
+                if (weapon.getType().equals("weapon")) {
+                    atkPower += weapon.getHpValue();
+
+                    //Randomly generate damage amount greater than at least half the attack power
+                    while (randDamage < (atkPower / 2)) {
+                        randDamage = rand.nextInt(atkPower) + 1;
+                    }
+
+                    //Combat.setResult("You used your " + weapon.getItemName() + "!");
+                    alien.takeDamage(randDamage);
+                }
             }
-        }
+        }else{
+                if (weapon == null) {
+                    atkPower += 2; //Hand combat power
+                    randDamage = rand.nextInt(atkPower) + 1;
+
+                    alien.takeDamage(randDamage);
+
+                    Combat.setResult("Used your fists!" + " " + synArray[synSelector] + " attack!");
+
+                } else {
+
+                    if (weapon.getType().equals("weapon")) {
+                        atkPower += weapon.getHpValue();
+
+                        //Randomly generate damage amount greater than at least half the attack power
+                        while (randDamage < (atkPower / 2)) {
+                            randDamage = rand.nextInt(atkPower) + 1;
+                        }
+
+                        //Combat.setResult("You used your " + weapon.getItemName() + "!");
+                        alien.takeDamage(randDamage);
+                    }
+                }
+            }
     }
 
     public static void takeDamage(int AttackStr) {

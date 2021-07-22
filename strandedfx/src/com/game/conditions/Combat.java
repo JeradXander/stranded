@@ -10,6 +10,10 @@ import com.game.world.GameWorld;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 
 public class Combat {
@@ -22,6 +26,8 @@ public class Combat {
     private String noun = "";
 
 
+
+
     //default constructor
     public Combat() throws InterruptedException, IOException {
         Alien soldier = createAlien();
@@ -32,7 +38,8 @@ public class Combat {
     //Combat methods
     private Alien createAlien() throws IOException {
         //Return alien from JSON file.
-        byte[] alienData = Files.readAllBytes(Paths.get("src/main/resources/enemies.json"));
+        //byte[] alienData = Files.readAllBytes(Paths.get("src/main/resources/enemies.json"));
+        byte[] alienData = Files.readAllBytes(Paths.get("resources/enemies.json"));
         ObjectMapper objectMapper = new ObjectMapper();
         Alien[] alien = objectMapper.readValue(alienData, Alien[].class);
 
@@ -101,6 +108,8 @@ public class Combat {
 
     private void fightStatus(Alien soldier) throws InterruptedException {
         Status.clearConsole();
+
+
 
         System.out.println("**********ALERT, ALIEN IS ATTACKING YOU*************");
         System.out.println("===================================================");
