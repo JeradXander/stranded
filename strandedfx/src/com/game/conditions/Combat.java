@@ -25,6 +25,8 @@ public class Combat {
     private String verb = "None";
     private String noun = "";
 
+    Player player = new Player("david", "Medic");
+
 
 
 
@@ -59,21 +61,21 @@ public class Combat {
     private void startCombat(Alien soldier) throws InterruptedException, IOException {
         if (soldier != null ) {
 
-            while (soldier.isAlive() && (Player.getHP() > Player.getMinHp())) {
+            while (soldier.isAlive() && (player.getHP() > player.getMinHp())) {
                 //Verify action
 
                 boolean doAction = false;
                 while (!doAction) {
 
                     fightStatus(soldier);
-                    String[] action = UserInput.action();
-
+//                    String[] action = UserInput.action();
+                    String [] action={"use", "fists"} ;
                     //verify a fight command was used somehow...
                     if (action[0].equals("use") || action[0].equals("shoot")) {
 
                         //Grab me the right weapon or null from inventory
                         Item weapon = null;
-                        for (Item item : Player.getInventory()) {
+                        for (Item item : player.getInventory()) {
                             if (item.getType().equals("weapon") && item.getItemName().equals(action[1])) {
                                 weapon = item;
                             } else {
@@ -83,7 +85,7 @@ public class Combat {
 
 
                         //Combat
-                        Player.attack(soldier, weapon);
+                        player.attack(soldier, weapon);
                         soldier.Attack();
                         soldier.checkAlive(); //Updates Alive Status
                         if (!soldier.isAlive()) {
@@ -115,9 +117,9 @@ public class Combat {
         System.out.println("===================================================");
         System.out.println("Enemy: " + soldier.getType() + " HP: " + soldier.getHp());
         System.out.println("===================================================");
-        System.out.println("Name: " + "dan" + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+        System.out.println("Name: " + "dan" + " | HP: " + player.getHP() + " / " + player.getMaxHp());
         //Player.getName()
-        System.out.println("Weapons available: fists " + Player.viewInventory("weapon"));
+        System.out.println("Weapons available: fists " + player.viewInventory("weapon"));
         System.out.println("---------------------------------------------------");
         System.out.println("Last action taken: " + getVerb() + " "+ getNoun());
         System.out.println(">" + getResult());

@@ -15,6 +15,8 @@ public class Status {
     private String noun = "";
     private String result = "";
 
+    Player player = new Player("david", "Medic");
+
     // Constructor
     public Status() {
 
@@ -31,7 +33,7 @@ public class Status {
         ArrayList<Item> inventoryArray = inventoryMap.get(currentLoc);
         HashMap<String, ArrayList<Item>> hiddenItemsMap = GameWorld.getHiddenItems();
         ArrayList<Item> hiddenItemsArray = hiddenItemsMap.get(currentLoc);
-        ArrayList<Item> playerItems = Player.getInventory();
+        ArrayList<Item> playerItems = player.getInventory();
 
         if (currentLoc == null || currentLoc.equals("")) {
             currentLoc = GameWorld.getPreviousLocation();
@@ -47,7 +49,7 @@ public class Status {
 
             // new method for moving player
             if (!nextLoc.equals(currentLoc)) { //This will prevent move method being called, so HP won't be penalized.
-                Player.move(nextLoc);
+                player.move(nextLoc);
             }
             //setResult("Moving is tiring and HP draining on this planet..");
         }
@@ -59,7 +61,7 @@ public class Status {
             Item removeItem = null;
             for(Item item: inventoryArray){
                 if(item.getItemName().equals(command[1])){
-                    Player.addItem(item);
+                    player.addItem(item);
                     removeItem = item;
                     setResult(item.getItemName() + " grabbed! " + item.getDescription());
                 } else {
@@ -126,7 +128,7 @@ public class Status {
 
                 if (usedItem.getType().equals("food")) {
 
-                    Player.eat(usedItem);
+                    player.eat(usedItem);
 
                     setResult(command[1] + " used!");
                 }
@@ -164,9 +166,9 @@ public class Status {
         System.out.println("\n");
         System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
         System.out.println("===================================================");
-        System.out.println("Name: " + "dan" + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+        System.out.println("Name: " + "dan" + " | HP: " + player.getHP() + " / " + player.getMaxHp());
         //Player.getName()
-        System.out.println("Current Inventory: " + Player.viewInventory());
+        System.out.println("Current Inventory: " + player.viewInventory());
         System.out.println("---------------------------------------------------");
         System.out.println("Last action taken: " + getAction() + " "+ getNoun());
         System.out.println(getResult()); //Display action results
@@ -204,15 +206,15 @@ public class Status {
 
     }
 
-    public static HashMap<String, Integer> fxDisplayPlayer() throws InterruptedException, IOException {
-        HashMap<String, Integer> fxPlayerHMap = new HashMap<>();
-        //System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
-        fxPlayerHMap.put("HP", Player.getHP());
-        fxPlayerHMap.put("MaxHP", Player.getMaxHp());
-
-        return fxPlayerHMap;
-
-    }
+//    public static HashMap<String, Integer> fxDisplayPlayer() throws InterruptedException, IOException {
+//        HashMap<String, Integer> fxPlayerHMap = new HashMap<>();
+//        //System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+//        fxPlayerHMap.put("HP", player.getHP());
+//        fxPlayerHMap.put("MaxHP", Player.getMaxHp());
+//
+//        return fxPlayerHMap;
+//
+//    }
 
     public static void clearConsole() throws InterruptedException {
         /* Code Attributed to DelftStack
