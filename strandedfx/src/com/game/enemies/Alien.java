@@ -25,6 +25,7 @@ public class Alien {
     private String type;
     private String location;
     private boolean isAlive = true;
+    Player player = new Player("david", "Medic");
 
     //Constants
     private final int MIN_HP = 0;
@@ -59,10 +60,10 @@ public class Alien {
         int randAttack = rand.nextInt(chance);
 
         if (randAttack == chance-1) {
-            Player.takeDamage(superAttack());
+            player.takeDamage(superAttack());
         }
         else {
-            Player.takeDamage(normalAttack());
+            player.takeDamage(normalAttack());
         }
     }
 

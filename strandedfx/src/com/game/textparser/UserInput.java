@@ -23,6 +23,7 @@ public class UserInput {
     private static String useItemGrabbed = "nothing";
     private static String locationToSearch = "here";
     private static String itemDropped = "none";
+    Player player = new Player("david", "Medic");
 
     public static String setPlayerName(){
         /*Takes user input and returns it so it can be stored as the name in the Player class. If the name is blank,
@@ -40,7 +41,7 @@ public class UserInput {
         return astronautName;
     }
 
-    public static String[] action() throws IOException {
+    public String[] action() throws IOException {
         /*Takes user input and it processes what type of action you are trying to take */
         byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
         Map<String,ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
@@ -101,8 +102,8 @@ public class UserInput {
     }
 
     //Need to update on commands engine
-    public static String useItem(String[] inputStringArrayArg){
-        String inventoryString = Player.viewInventory().toString();
+    public String useItem(String[] inputStringArrayArg){
+        String inventoryString = player.viewInventory().toString();
         if(inventoryString.contains(inputStringArrayArg[1])){
             useItemGrabbed = inputStringArrayArg[1];
         } else {
@@ -119,8 +120,8 @@ public class UserInput {
     }
 
     //Validation handled by status
-    public static String dropItem(String[] inputStringArray) {
-        String inventoryString = Player.viewInventory().toString();
+    public  String dropItem(String[] inputStringArray) {
+        String inventoryString = player.viewInventory().toString();
         if (inventoryString.contains(inputStringArray[1])) {
             itemDropped = inputStringArray[1];
         } else {
