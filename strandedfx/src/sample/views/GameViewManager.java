@@ -66,6 +66,8 @@ public class GameViewManager {
     private SmallStrandedSubScene mapSubscene;
     private GameStrandedSubScene displayTextSubScene;
 
+
+
     private TextField textField;
     private StrandedButton submitButton;
 
@@ -81,6 +83,10 @@ public class GameViewManager {
 
     private Label displayText;
     private Label descriptionText;
+    private Label displayInventory;
+    private Label displayName;
+    private Label lastCommand;
+    private Label displayPlayerHealth;
 
 //    User input variables
     private String moveDirection = "nowhere";
@@ -97,6 +103,17 @@ public class GameViewManager {
          planet1 = ourGame.getPlanet1();
          status = new Status();
          playerCreated =  _playerCreated;
+
+        if (playerCreated.getAstronautClass().equals("Medic")){
+            //Player.addItem(Item med-pack);
+            Location medpacks = planet1.get("Starting Items");
+            playerCreated.move("Starting Items");
+            status.action(new String[] {"grab", "med-pack"}, playerCreated);
+
+            System.out.println("As the medic you start out with five med-packs!");
+            playerCreated.move("Crash Site");
+            playerCreated.setHP(100);
+        }
 
         buttonList = new ArrayList<>();
         //creating main window to hold all children
@@ -138,16 +155,7 @@ public class GameViewManager {
 
 
 //        Start Game Method/logic
-        if (playerCreated.getAstronautClass().equals("Medic")){
-            //Player.addItem(Item med-pack);
-            Location medpacks = planet1.get("Starting Items");
-            playerCreated.move("Starting Items");
-            status.action(new String[] {"grab", "med-pack"});
 
-            System.out.println("As the medic you start out with five med-packs!");
-            playerCreated.move("Crash Site");
-            playerCreated.setHP(100);
-        }
 
     }
 
@@ -221,6 +229,8 @@ public class GameViewManager {
                 {
                     try {
                         startParsing(textField.getText());
+                        lastCommand.setText("Last Command: " + textField.getText());
+                        textField.clear();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -236,7 +246,7 @@ public class GameViewManager {
         System.out.println(input);
         input.toLowerCase();
         String [] actionArray = action(input);
-
+        status.action(actionArray, playerCreated);
 
     }
 
@@ -299,6 +309,8 @@ public class GameViewManager {
 
                 try {
                     startParsing(textField.getText());
+                    lastCommand.setText("Last Command: " + textField.getText());
+                    textField.clear();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -430,6 +442,32 @@ public class GameViewManager {
             descriptionText.setLayoutY(50);
             displayTextSubScene.getAnchorPane().getChildren().add(descriptionText);
 
+        //inventory
+        displayInventory = new Label("Inventory: " + playerCreated.viewInventory());
+        displayInventory.setLayoutX(25);
+        displayInventory.setLayoutY(350);
+        displayTextSubScene.getAnchorPane().getChildren().add(displayInventory);
+
+        //name
+        displayName = new Label("Name: " + playerCreated.getName());
+        displayName.setLayoutX(25);
+        displayName.setLayoutY(290);
+        displayTextSubScene.getAnchorPane().getChildren().add(displayName);
+
+        //lastCommand
+        lastCommand = new Label("Last Command: ");
+        lastCommand.setLayoutX(25);
+        lastCommand.setLayoutY(310);
+        displayTextSubScene.getAnchorPane().getChildren().add(lastCommand);
+
+        //display Player Health
+        displayPlayerHealth = new Label("Player Health: " + playerCreated.getHP() + " / " + playerCreated.getMaxHp());
+        displayPlayerHealth.setLayoutX(25);
+        displayPlayerHealth.setLayoutY(330);
+        displayTextSubScene.getAnchorPane().getChildren().add(displayPlayerHealth);
+
+
+
         mainPane.getChildren().add(displayTextSubScene);
     }
 
@@ -442,6 +480,8 @@ public class GameViewManager {
 
         sceneThatNeedsToSlide = subScene;
     }
+
+
 
     //
     //
