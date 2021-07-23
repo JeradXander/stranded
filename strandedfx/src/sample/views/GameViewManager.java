@@ -1,8 +1,20 @@
 package sample.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.player.Player;
-import java.util.ArrayList;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import com.game.startmenu.Status;
+import com.game.textparser.Directions;
+import com.game.world.GameWorld;
+import com.game.world.Location;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -31,6 +43,8 @@ import javafx.stage.Stage;
 import sample.MenuMain;
 import sample.models.*;
 
+import static com.game.world.GameWorld.currentLocation;
+
 
 public class GameViewManager {
 
@@ -50,7 +64,7 @@ public class GameViewManager {
     private StrandedSubScene playSubscene;
     private StrandedSubScene astroChooserScene;
     private SmallStrandedSubScene mapSubscene;
-    private StrandedSubScene displayTextSubScene;
+    private GameStrandedSubScene displayTextSubScene;
 
     private TextField textField;
     private StrandedButton submitButton;
@@ -62,19 +76,40 @@ public class GameViewManager {
     private Scene mainScene;
     private Stage mainStage;
 
+    private GameWorld ourGame;
+    private HashMap<String, Location> planet1;
+
+    private Label displayText;
+    private Label descriptionText;
+
+//    User input variables
+    private String moveDirection = "nowhere";
+    private String itemGrabbed = "nothing";
+    private String useItemGrabbed = "nothing";
+    private String locationToSearch = "here";
+    private String itemDropped = "none";
+    private Player playerCreated;
+    private Status status;
+
 // Constructor
-    public GameViewManager(Player playerCreated){
+    public GameViewManager(Player _playerCreated) throws IOException, InterruptedException {
+         ourGame = new GameWorld();
+         planet1 = ourGame.getPlanet1();
+         status = new Status();
+         playerCreated =  _playerCreated;
+
         buttonList = new ArrayList<>();
         //creating main window to hold all children
         mainPane = new AnchorPane();
         mainScene = new Scene(mainPane, WIDTH, HEIGHT, Color.RED);
         mainStage = new Stage();
+
         //setting scene
         mainStage.setScene(mainScene);
 
         mainStage.setResizable(false);
 
-        mainStage.setTitle(playerCreated.getName() + "special: " );
+        mainStage.setTitle("Name: " + playerCreated.getName() + "  | Astronaut Class: " + playerCreated.getAstronautClass() + "  | Current Location: " + currentLocation);
 
         createSubscenes();
 
@@ -90,7 +125,7 @@ public class GameViewManager {
         createSlider();
         createTextScene();
         createTextField();
-        createLabel();
+//        createLabel();
 
 
         MenuMain.fxmediaPlayer.play();
@@ -100,6 +135,20 @@ public class GameViewManager {
 //
 //        StrandedSubScene subscene = new StrandedSubScene();
 //        mainPane.getChildren().add(subscene);
+
+
+//        Start Game Method/logic
+        if (playerCreated.getAstronautClass().equals("Medic")){
+            //Player.addItem(Item med-pack);
+            Location medpacks = planet1.get("Starting Items");
+            playerCreated.move("Starting Items");
+            status.action(new String[] {"grab", "med-pack"});
+
+            System.out.println("As the medic you start out with five med-packs!");
+            playerCreated.move("Crash Site");
+            playerCreated.setHP(100);
+        }
+
     }
 
     //method to get main stage
@@ -170,7 +219,11 @@ public class GameViewManager {
             public void handle(KeyEvent keyEvent) {
                 if(keyEvent.getCode().equals(KeyCode.ENTER))
                 {
-                    startParsing(textField.getText());
+                    try {
+                        startParsing(textField.getText());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("success!");
 
                 }
@@ -179,19 +232,54 @@ public class GameViewManager {
 
     }
 
-    private void startParsing(String input){
+    private void startParsing(String input) throws IOException {
         System.out.println(input);
+        input.toLowerCase();
+        String [] actionArray = action(input);
 
 
     }
 
-    private void createLabel(){
-        //This is to display all the game text
-        Label displayText = new Label("Game Text");
-        displayText.setLayoutX(500);
-        displayText.setLayoutY(500);
-        mainPane.getChildren().add(displayText);
+    public String[] action(String playerControlString) throws IOException {
+        /*Takes user input and it processes what type of action you are trying to take */
+        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        Map<String,ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        myMap = objectMapper.readValue(mapData, HashMap.class);
+
+
+        System.out.println("Perform an action: ");
+        String[] inputStringArray = playerControlString.split(" ", 3);
+        String[] invalidArray = {"NOT", "VALID"};
+
+        if(inputStringArray.length != 2){
+            return invalidArray;
+        }
+
+        if(myMap.get("go").contains(inputStringArray[0])){
+            inputStringArray[0] = "go";
+            inputStringArray[1] = move(inputStringArray);
+        } else if (myMap.get("grab").contains(inputStringArray[0])){
+            inputStringArray[0] = "grab";
+            inputStringArray[1] = grabItem(inputStringArray);
+        }else if (myMap.get("use").contains(inputStringArray[0])){
+            inputStringArray[0] = "use";
+            inputStringArray[1] = useItem(inputStringArray);
+        } else if (myMap.get("search").contains(inputStringArray[0])) {
+            inputStringArray[0] = "search";
+            inputStringArray[1] = search(inputStringArray);
+        } else if (myMap.get("drop").contains(inputStringArray[0])){
+            inputStringArray[0] = "drop";
+            inputStringArray[1] = dropItem(inputStringArray);
+        } else {
+            return invalidArray;
+        }
+
+        return inputStringArray;
     }
+
+
 
     private void createSubmitTextButton(){
         submitButton = new StrandedButton("SEND COMMAND");
@@ -209,7 +297,11 @@ public class GameViewManager {
                 MenuMain.clickMediaPlayer.stop();
                 MenuMain.clickMediaPlayer.play();
 
-                startParsing(textField.getText());
+                try {
+                    startParsing(textField.getText());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -313,14 +405,32 @@ public class GameViewManager {
         });
     }
 
-    private void createTextScene(){
-        StrandedSubScene displayTextSubScene = new StrandedSubScene();
-        mapSubscene.getAnchorPane().getChildren().add(displayTextSubScene);
-        //add text to be displayed
-        //mapSubscene.getAnchorPane().getChildren().add(map);
+    private void createTextScene() throws IOException, InterruptedException {
+        displayTextSubScene = new GameStrandedSubScene();
+
+            //This is to display all the game text
+            displayText = new Label("Participate in the activities associated with the design, development, and support for \n" +
+                    "PeopleSoft implementation or upgrade projects. Provide engagement delivery services both \n" +
+                    "as an individual and as a team member. Services include identifying needs, developing, \n" +
+                    "influencing, and implementing proposals. Able to lead, support, and participate in project \n" +
+                    "teams to ensure system and business requirements are clearly documented and understood. \n" +
+                    "This position requires the ability to manage multiple tasks and link those tasks to business \n" +
+                    "initiatives. Familiarity with all aspects of the software development life cycle and expertise in \n" +
+                    "utilizing software implementation methodology based on industry best practices. Must be \n" +
+                    "willing to travel (if required by customer)");
+            displayText.setLayoutX(25);
+            displayText.setLayoutY(25);
+            displayTextSubScene.getAnchorPane().getChildren().add(displayText);
+            displayText.setText("Location: " + currentLocation);
+        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
+            descriptionText = new Label("Description: " + fxCurrLocation.get("Description"));
+            descriptionText.setMaxWidth(350);
+            descriptionText.setWrapText(true);
+            descriptionText.setLayoutX(25);
+            descriptionText.setLayoutY(50);
+            displayTextSubScene.getAnchorPane().getChildren().add(descriptionText);
 
         mainPane.getChildren().add(displayTextSubScene);
-
     }
 
     private void showAndHideSubscenes(StrandedSubScene subScene){
@@ -332,5 +442,90 @@ public class GameViewManager {
 
         sceneThatNeedsToSlide = subScene;
     }
+
+    //
+    //
+    //
+    //
+    //  User Input Section
+    public String move(String[] inputStringArrayArg){
+        String directionString = inputStringArrayArg[1].toUpperCase();
+        if(!directionString.equals("NORTH") && !directionString.equals("SOUTH") && !directionString.equals("EAST") && !directionString.equals("WEST")){
+            return moveDirection;
+        }
+
+        for(Directions direction: Directions.values()){
+            if(direction.equals(Directions.valueOf(directionString))){
+                moveDirection = inputStringArrayArg[1];
+            }
+        }
+        return moveDirection;
+    }
+
+
+    public String grabItem(String[] inputStringArrayArg){
+        itemGrabbed = inputStringArrayArg[1];
+        return itemGrabbed;
+    }
+
+    //Need to update on commands engine
+    public String useItem(String[] inputStringArrayArg){
+        String inventoryString = playerCreated.viewInventory().toString();
+        if(inventoryString.contains(inputStringArrayArg[1])){
+            useItemGrabbed = inputStringArrayArg[1];
+        } else {
+            useItemGrabbed = "";
+        }
+
+        return useItemGrabbed;
+
+    }
+
+    //needs validation?
+    public String search(String[] inputStringArrayArg){
+        return locationToSearch;
+    }
+
+    //Validation handled by status
+    public String dropItem(String[] inputStringArray) {
+        String inventoryString = playerCreated.viewInventory().toString();
+        if (inventoryString.contains(inputStringArray[1])) {
+            itemDropped = inputStringArray[1];
+        } else {
+            itemDropped = "";
+        }
+        return itemDropped;
+    }
+
+//    public boolean playAgain(){
+//        boolean askForReplay = true;
+//        int userNum = 0;
+//        while (askForReplay){
+//            System.out.println("Would you like to play Stranded again?");
+//            System.out.println("Please enter the number for your choice");
+//            System.out.println("1) Yes\n2) No");
+//
+//            try {
+////                String userString = input.nextLine();
+//                userNum = Integer.parseInt(userString);
+//
+//                if(userNum > 0 && userNum < 3){
+//                    askForReplay = false;
+//                    break;
+//                } else {
+//                    System.out.println("Invalid Choice");
+//                    System.out.println("====================");
+//                }
+//
+//            } catch (Exception e){
+//                System.out.println("Invalid Choice");
+//                System.out.println("====================");
+//            }
+//        }
+//
+//        return userNum == 1;
+//
+//
+//    }
 
 }

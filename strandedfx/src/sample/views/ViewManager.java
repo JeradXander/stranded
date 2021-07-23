@@ -1,6 +1,8 @@
 package sample.views;
 
 import com.game.player.Player;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
@@ -142,7 +144,12 @@ public class ViewManager {
             public void handle(MouseEvent mouseEvent) {
                 System.out.println("clicked");
                 MenuMain.mediaPlayer.stop();
-                GameViewManager manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
+                GameViewManager manager = null;
+                try {
+                    manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mainStage = manager.getMainStage();
                 // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
 //                mainStage.setTitle("GameView");
