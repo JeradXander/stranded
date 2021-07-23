@@ -145,8 +145,9 @@ public class GameViewManager {
     private void createTextField(){
 
         textField = new TextField();
-        textField.setLayoutX(300);
-        textField.setLayoutY(600);
+        textField.setLayoutX(700);
+        textField.setLayoutY(675);
+        textField.setPrefSize(250, 40);
         mainPane.getChildren().add(textField);
 //        textField.setOnInputMethodTextChanged(new EventHandler<InputMethodEvent>() {
 //            @Override
@@ -183,9 +184,9 @@ public class GameViewManager {
 
     private void createSubmitTextButton(){
         submitButton = new StrandedButton("SEND COMMAND");
-
-        submitButton.setLayoutX(500);
-        submitButton.setLayoutY(600);
+//        submitButton.setMaxWidth(200);
+        submitButton.setLayoutX(725);
+        submitButton.setLayoutY(725);
         //addMenuButton(submitButton);
         submitButton.setButtonFontForLongText();
         mainPane.getChildren().add(submitButton);
@@ -238,6 +239,8 @@ public class GameViewManager {
     private void createExitButton(){
         StrandedButton exitButton = new StrandedButton("EXIT");
         mainPane.getChildren().add(exitButton);
+        exitButton.setLayoutY(725);
+        exitButton.setLayoutX(25);
 
         exitButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -266,7 +269,7 @@ public class GameViewManager {
         map.setLayoutX(130);
         map.setLayoutY(25);
         mapButton.setLayoutX(250);
-        mapButton.setLayoutY(700);
+        mapButton.setLayoutY(725);
         mapSubscene.getAnchorPane().getChildren().add(mapButton);
         mapSubscene.getAnchorPane().getChildren().add(map);
 
