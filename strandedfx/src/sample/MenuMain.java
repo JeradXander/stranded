@@ -27,6 +27,8 @@ public class MenuMain extends Application {
     }
     public static MediaPlayer mediaPlayer;
     public static MediaPlayer fxmediaPlayer;
+    public static MediaPlayer laserMediaPlayer;
+    public  static MediaPlayer clickMediaPlayer;
     public void music() {
         // String s = "src/sample/views/resources/intro.wav";
         // String path = Paths.get(s).toUri().toString();
@@ -34,6 +36,7 @@ public class MenuMain extends Application {
         System.out.println(respath);
         Media h = new Media(respath);
         mediaPlayer = new MediaPlayer(h);
+        mediaPlayer.setVolume(5 * 0.01);
         mediaPlayer.play();
 
 
@@ -41,6 +44,20 @@ public class MenuMain extends Application {
         System.out.println(fxpath);
         Media fx = new Media(fxpath);
         fxmediaPlayer = new MediaPlayer(fx);
+        fxmediaPlayer.setVolume(5 * 0.01);
+
+        String laserPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("beep.mp3")).toExternalForm();
+        System.out.println(laserPath);
+        Media las = new Media(laserPath);
+        laserMediaPlayer = new MediaPlayer(las);
+        laserMediaPlayer.setVolume(5 * 0.01);
+
+        String clickPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("10.mp3")).toExternalForm();
+        System.out.println(clickPath);
+        Media clk = new Media(clickPath);
+        clickMediaPlayer = new MediaPlayer(clk);
+        clickMediaPlayer.setVolume(5 * 0.01);
+
     }
 
 
