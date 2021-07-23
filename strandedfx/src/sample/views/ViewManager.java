@@ -79,6 +79,7 @@ public class ViewManager {
 
         createchooseSubscene();
 
+
         StrandedSubScene subscene = new StrandedSubScene();
         mainPane.getChildren().add(subscene);
     }
