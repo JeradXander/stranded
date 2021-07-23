@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
@@ -28,11 +29,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import sample.MenuMain;
-import sample.models.ASTRO;
-import sample.models.AstroPicker;
-import sample.models.InfoLabel;
-import sample.models.StrandedButton;
-import sample.models.StrandedSubScene;
+import sample.models.*;
 
 
 public class GameViewManager {
@@ -52,7 +49,9 @@ public class GameViewManager {
     private StrandedSubScene scoreSubscene;
     private StrandedSubScene playSubscene;
     private StrandedSubScene astroChooserScene;
-    private StrandedSubScene mapSubscene;
+    private SmallStrandedSubScene mapSubscene;
+    private StrandedSubScene displayTextSubScene;
+
     private TextField textField;
     private StrandedButton submitButton;
 
@@ -89,7 +88,9 @@ public class GameViewManager {
         createSubmitTextButton();
 //
         createSlider();
+        createTextScene();
         createTextField();
+        createLabel();
 
 
         MenuMain.fxmediaPlayer.play();
@@ -122,7 +123,7 @@ public class GameViewManager {
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
 
-        mapSubscene = new StrandedSubScene();
+        mapSubscene = new SmallStrandedSubScene();
         mainPane.getChildren().add(mapSubscene);
 
     }
@@ -171,6 +172,7 @@ public class GameViewManager {
                 {
                     startParsing(textField.getText());
                     System.out.println("success!");
+
                 }
             }
         });
@@ -180,6 +182,15 @@ public class GameViewManager {
     private void startParsing(String input){
         System.out.println(input);
 
+
+    }
+
+    private void createLabel(){
+        //This is to display all the game text
+        Label displayText = new Label("Game Text");
+        displayText.setLayoutX(500);
+        displayText.setLayoutY(500);
+        mainPane.getChildren().add(displayText);
     }
 
     private void createSubmitTextButton(){
@@ -264,16 +275,18 @@ public class GameViewManager {
     private void creatMapButton(){
         StrandedButton mapButton = new StrandedButton("MAP");
         map = new ImageView("sample/models/resources/maps/crashSite.png");
-        map.setFitWidth(350);
+        map.setFitWidth(250);
         map.setPreserveRatio(true);
-        map.setLayoutX(130);
+        map.setLayoutX(25);
         map.setLayoutY(25);
         mapButton.setLayoutX(250);
         mapButton.setLayoutY(725);
+
         mapSubscene.getAnchorPane().getChildren().add(mapButton);
         mapSubscene.getAnchorPane().getChildren().add(map);
 
         mainPane.getChildren().add(mapButton);
+
 
         mapButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -298,6 +311,16 @@ public class GameViewManager {
                 mapButton.setEffect(dropshad);
             }
         });
+    }
+
+    private void createTextScene(){
+        StrandedSubScene displayTextSubScene = new StrandedSubScene();
+        mapSubscene.getAnchorPane().getChildren().add(displayTextSubScene);
+        //add text to be displayed
+        //mapSubscene.getAnchorPane().getChildren().add(map);
+
+        mainPane.getChildren().add(displayTextSubScene);
+
     }
 
     private void showAndHideSubscenes(StrandedSubScene subScene){
