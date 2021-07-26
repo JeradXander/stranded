@@ -8,6 +8,7 @@ import com.game.world.Location;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import sample.views.GameViewManager;
 
 public class Status {
 
@@ -17,6 +18,8 @@ public class Status {
 
     Player player = new Player("david", "Medic");
 
+    GameViewManager gameViewManager;
+
     // Constructor
     public Status() {
 
@@ -24,11 +27,12 @@ public class Status {
 
     //Methods for actions
 
-public void action(String[] command, Player _player) throws IllegalArgumentException{
+public void action(String[] command, Player _player, GameViewManager _gameViewManager) throws IllegalArgumentException{
     //command[0] is action, command[1] is direction/item/etc.
 
     player = _player;
 
+    System.out.println(player.getName()+player.getAstronautClass());
         //Initialize variables for action logic
         String currentLoc = GameWorld.getCurrentLocation();
         HashMap<String, ArrayList<Item>> inventoryMap = GameWorld.getGameItems();
@@ -161,6 +165,14 @@ public void action(String[] command, Player _player) throws IllegalArgumentExcep
         }
         Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
 
+//        gameViewManager.locationText.setText(currentLocData.getName());
+//
+//        gameViewManager.descriptionText.setText("===================================================\n" +
+//                                                "Description: \" +  currentLocData.getDescription()\n" +
+//                                                "Items you see: " + GameWorld.getItemsByLocation(currentLoc)+
+//                                                "===================================================\n" +
+//                                                "" );
+
         System.out.println("===================================================");
         System.out.println("Location: " + currentLocData.getName());
         System.out.println("===================================================");
@@ -179,7 +191,7 @@ public void action(String[] command, Player _player) throws IllegalArgumentExcep
     }
 
     //method to send info to javafx
-    public static HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
+    public HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
         HashMap<String, String> fxLocationHMap = new HashMap<>();
         String currentLoc = GameWorld.getCurrentLocation();
         if (currentLoc == null || currentLoc.equals("")) {
