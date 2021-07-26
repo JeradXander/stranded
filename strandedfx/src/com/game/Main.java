@@ -38,7 +38,7 @@ public class Main {
                     //Player.addItem(Item med-pack);
                     Location medpacks = planet1.get("Starting Items");
                     player.move("Starting Items");
-                    status.action(new String[] {"grab", "med-pack"});
+                    //status.action(new String[] {"grab", "med-pack"});
 
                     System.out.println("As the medic you start out with five med-packs!");
                     player.move("Crash Site");
