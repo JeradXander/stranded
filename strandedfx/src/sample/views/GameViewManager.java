@@ -1,34 +1,37 @@
 package sample.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.game.conditions.Travel;
+import com.game.conditions.Win;
 import com.game.player.Player;
 
+import com.game.textparser.UserInput;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import com.game.startmenu.Status;
 import com.game.textparser.Directions;
 import com.game.world.GameWorld;
 import com.game.world.Location;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -37,9 +40,11 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import sample.GameController;
 import sample.MenuMain;
 import sample.models.*;
 
@@ -52,12 +57,16 @@ public class GameViewManager {
     private static final int WIDTH = 1050;
     private static final int MENU_BUTTONS_START_X = 100;
     private static final int MENU_BUTTONS_START_Y = 225;
-    private StrandedSubScene sceneThatNeedsToSlide;
+    BackgroundImage background;
+    private SmallHelpSubScene gameHelpSubscene;
+
+
 
     private ArrayList<StrandedButton> buttonList;
     private ArrayList<AstroPicker> astroList;
     private ASTRO chosenAstro;
 
+    private StrandedSubScene sceneThatNeedsToSlide;
     private StrandedSubScene creditSubscene;
     private StrandedSubScene helpSubscene;
     private StrandedSubScene scoreSubscene;
@@ -65,8 +74,6 @@ public class GameViewManager {
     private StrandedSubScene astroChooserScene;
     private SmallStrandedSubScene mapSubscene;
     private GameStrandedSubScene displayTextSubScene;
-
-
 
     private TextField textField;
     private StrandedButton submitButton;
@@ -81,8 +88,8 @@ public class GameViewManager {
     private GameWorld ourGame;
     private HashMap<String, Location> planet1;
 
-    private Label displayText;
-    private Label descriptionText;
+    public Label locationText;
+    public Label descriptionText;
     private Label displayInventory;
     private Label displayName;
     private Label lastCommand;
@@ -102,13 +109,14 @@ public class GameViewManager {
          ourGame = new GameWorld();
          planet1 = ourGame.getPlanet1();
          status = new Status();
+
          playerCreated =  _playerCreated;
 
         if (playerCreated.getAstronautClass().equals("Medic")){
             //Player.addItem(Item med-pack);
             Location medpacks = planet1.get("Starting Items");
             playerCreated.move("Starting Items");
-            status.action(new String[] {"grab", "med-pack"}, playerCreated);
+            status.action(new String[] {"grab", "med-pack"}, playerCreated, this);
 
             System.out.println("As the medic you start out with five med-packs!");
             playerCreated.move("Crash Site");
@@ -137,25 +145,15 @@ public class GameViewManager {
         createBackGround();
 //
         creatMapButton();
+
         createSubmitTextButton();
 //
         createSlider();
         createTextScene();
         createTextField();
-//        createLabel();
 
-
+        createHelpButton();
         MenuMain.fxmediaPlayer.play();
-
-//
-//        createchooseSubscene();
-//
-//        StrandedSubScene subscene = new StrandedSubScene();
-//        mainPane.getChildren().add(subscene);
-
-
-//        Start Game Method/logic
-
 
     }
 
@@ -168,21 +166,14 @@ public class GameViewManager {
         creditSubscene = new StrandedSubScene();
         mainPane.getChildren().add(creditSubscene);
 
-//        helpSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(helpSubscene);
-//
-//        playSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(playSubscene);
-//
-//        scoreSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(scoreSubscene);
-
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
 
         mapSubscene = new SmallStrandedSubScene();
         mainPane.getChildren().add(mapSubscene);
 
+        gameHelpSubscene = new SmallHelpSubScene();
+        mainPane.getChildren().add(gameHelpSubscene);
     }
 
     private void createSlider(){
@@ -195,6 +186,7 @@ public class GameViewManager {
                 MenuMain.fxmediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 MenuMain.laserMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 MenuMain.clickMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
+                MenuMain.launchMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 System.out.println("volume" + volumeControl.getValue());
             }
         });
@@ -216,7 +208,6 @@ public class GameViewManager {
         textField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                System.out.println("text changed");
                 MenuMain.laserMediaPlayer.stop();
                 MenuMain.laserMediaPlayer.play();
             }
@@ -231,7 +222,7 @@ public class GameViewManager {
                         startParsing(textField.getText());
                         lastCommand.setText("Last Command: " + textField.getText());
                         textField.clear();
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         e.printStackTrace();
                     }
                     System.out.println("success!");
@@ -242,11 +233,288 @@ public class GameViewManager {
 
     }
 
-    private void startParsing(String input) throws IOException {
+    private void startParsing(String input) throws IOException, InterruptedException {
         System.out.println(input);
         input.toLowerCase();
         String [] actionArray = action(input);
-        status.action(actionArray, playerCreated);
+        System.out.println(playerCreated.getName() + playerCreated.getAstronautClass());
+        status.action(actionArray, playerCreated,this);
+
+        HashMap<String,String> fxStatus = status.fxDisplayLocation();
+
+        locationText.setText(fxStatus.get("Location"));
+
+        setMapImage(fxStatus.get("Location"));
+
+        descriptionText.setText(fxStatus.get("Description") + "\nItems you see: "+ fxStatus.get("Items"));
+        //locationText.setText(fxStatus.get("Location"));
+
+
+        if(playerCreated.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
+
+            MenuMain.launchMediaPlayer.play();
+            background = new BackgroundImage(new Image("sample/models/resources/shuttle.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                             BackgroundPosition.DEFAULT,null);
+            mainPane.setBackground(new Background(background));
+            descriptionText.setText("\"Hmmmm....I think I have enough supplies to fix the craft and now\n" +
+                                    "Fixing spacecraft...\n" +
+                                    "Take OFF\n" +
+                                    "Landed");
+
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(7), new EventHandler<ActionEvent>() {
+
+
+                @Override
+                public void handle(ActionEvent event) {
+
+
+                    GameWorld.setCurrentLocation("Landing Site");
+                    setMapImage(GameWorld.getCurrentLocation());
+                    locationText.setText(GameWorld.getCurrentLocation());
+
+                }
+            }));
+            timeline.play();
+
+        }
+
+        if(playerCreated.getHP() == 0){
+           // Lose.youLose();
+            if(UserInput.playAgain() == true){
+
+                playerCreated.clearInventory();
+                GameWorld.setCurrentLocation("Crash Site");
+                status = new Status();
+                playerCreated = null;
+
+            } else {
+
+            }
+
+        }
+
+        if (playerCreated.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
+            Win.youWin();
+        }
+    }
+
+    private void setMapImage(String location) {
+        mapSubscene.getAnchorPane().getChildren().remove(map);
+        switch (location){
+
+            case "Crash Site":
+                map.setImage(new Image("sample/models/resources/maps/crashSite.png"));
+                background = new BackgroundImage(new Image("sample/views/resources/crashsite.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Frozen Tundra":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/frozenTundra.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/frozenTundra.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Jungle":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/jungle.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/jungle.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Beach":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/beach.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/beach.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Creek":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/creek.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/creek.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Mountains":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/mountains.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/mountains.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+
+            case "Far East Crater":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/farEastCrater.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/farEastCrater.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+
+            case "Alien Compound":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/alienCompound.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/alienCompound.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+
+            case "Abandoned Storage Facility":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/abandonedStorage.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/abandonedStorageFacility.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Abandoned Ship":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/abandonedShip.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/abandonedShip.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Lava Tubes":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/lavaTubes.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/lavaTubes.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "South Crater":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/southCrater.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/southCrater.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Crater":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/crater.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/crater.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Landing Site":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/landingSite.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/landingSite.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Alien Compound 2":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/alienCompound2.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/alienCompoundPlanet2.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Lava Tube":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/lavaTube.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/lavaTube.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Rock Shrine":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/rockShrine.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/rockShrine.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Dead Volcano":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/deadVolcano.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/deadVolcano.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Fuel Outpost":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/fuelOutpost.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT,null);
+                map.setImage(new Image("sample/models/resources/maps/fuelOutpost.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+        }
 
     }
 
@@ -311,7 +579,7 @@ public class GameViewManager {
                     startParsing(textField.getText());
                     lastCommand.setText("Last Command: " + textField.getText());
                     textField.clear();
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -330,23 +598,10 @@ public class GameViewManager {
 
     }
 
-
-
     private void createButton(){
 
-//        createPlayButton();
-//        createScoreButton();
-//        createHelpButton();
-//        createCreditsButton();
         createExitButton();
     }
-
-
-
-
-
-
-
 
 //    credit button main menu
 
@@ -369,7 +624,7 @@ public class GameViewManager {
 // Crashsite
     private void createBackGround(){
         Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
-        BackgroundImage background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
+        background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
                                                          BackgroundPosition.DEFAULT,null);
 
         mainPane.setBackground(new Background(background));
@@ -417,24 +672,73 @@ public class GameViewManager {
         });
     }
 
+    private void createHelpButton(){
+        StrandedButton helpButton = new StrandedButton("HELP");
+
+        InfoLabelSmall help = new InfoLabelSmall("Type Commands to Play the Game. \n\nMove: Go + Direction 'North, East, South, West'\n\n" +
+                                       "Grab Item: Grab + Item/Weapon/Food \n\nInspect Surroundings: Search + here/area name \n\nDrop Item: Drop + item \n\n" +
+                                       "Use Item: Use/Eat + Item/Weapon/Food \n\nPress the Map button to check the Map. If you don't remember the commands use similar words");
+        help.setFont(Font.font("Verdana", 12));
+
+        help.setLayoutX(10);
+        help.setLayoutY(5);
+
+
+
+
+
+
+
+
+        //gameHelpSubscene = new SmallHelpSubScene();
+        helpButton.setLayoutX(475);
+        helpButton.setLayoutY(725);
+
+        gameHelpSubscene.getHelpAnchorPane().getChildren().add(help);
+        gameHelpSubscene.getHelpAnchorPane().getChildren().add(helpButton);
+        mainPane.getChildren().add(helpButton);
+        helpButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                MenuMain.clickMediaPlayer.stop();
+                MenuMain.clickMediaPlayer.play();
+                if (!gameHelpSubscene.helpIsHidden()){
+                     gameHelpSubscene.hideHelpSubScene();
+                } else {
+                    gameHelpSubscene.showHelpSubScene();
+                }
+            }
+        });
+        helpButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                DropShadow dropshad = new DropShadow();
+                dropshad.setColor(Color.ORANGE);
+                helpButton.setEffect(dropshad);
+            }
+        });
+    }
+
+
+
     private void createTextScene() throws IOException, InterruptedException {
         displayTextSubScene = new GameStrandedSubScene();
 
             //This is to display all the game text
-            displayText = new Label("Participate in the activities associated with the design, development, and support for \n" +
-                    "PeopleSoft implementation or upgrade projects. Provide engagement delivery services both \n" +
-                    "as an individual and as a team member. Services include identifying needs, developing, \n" +
-                    "influencing, and implementing proposals. Able to lead, support, and participate in project \n" +
-                    "teams to ensure system and business requirements are clearly documented and understood. \n" +
-                    "This position requires the ability to manage multiple tasks and link those tasks to business \n" +
-                    "initiatives. Familiarity with all aspects of the software development life cycle and expertise in \n" +
-                    "utilizing software implementation methodology based on industry best practices. Must be \n" +
-                    "willing to travel (if required by customer)");
-            displayText.setLayoutX(25);
-            displayText.setLayoutY(25);
-            displayTextSubScene.getAnchorPane().getChildren().add(displayText);
-            displayText.setText("Location: " + currentLocation);
-        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
+            locationText = new Label("Participate in the activities associated with the design, development, and support for \n" +
+                                     "PeopleSoft implementation or upgrade projects. Provide engagement delivery services both \n" +
+                                     "as an individual and as a team member. Services include identifying needs, developing, \n" +
+                                     "influencing, and implementing proposals. Able to lead, support, and participate in project \n" +
+                                     "teams to ensure system and business requirements are clearly documented and understood. \n" +
+                                     "This position requires the ability to manage multiple tasks and link those tasks to business \n" +
+                                     "initiatives. Familiarity with all aspects of the software development life cycle and expertise in \n" +
+                                     "utilizing software implementation methodology based on industry best practices. Must be \n" +
+                                     "willing to travel (if required by customer)");
+            locationText.setLayoutX(25);
+            locationText.setLayoutY(25);
+            displayTextSubScene.getAnchorPane().getChildren().add(locationText);
+            locationText.setText("Location: " + currentLocation);
+            HashMap<String, String> fxCurrLocation = status.fxDisplayLocation();
             descriptionText = new Label("Description: " + fxCurrLocation.get("Description"));
             descriptionText.setMaxWidth(350);
             descriptionText.setWrapText(true);
@@ -467,7 +771,6 @@ public class GameViewManager {
         displayTextSubScene.getAnchorPane().getChildren().add(displayPlayerHealth);
 
 
-
         mainPane.getChildren().add(displayTextSubScene);
     }
 
@@ -482,11 +785,6 @@ public class GameViewManager {
     }
 
 
-
-    //
-    //
-    //
-    //
     //  User Input Section
     public String move(String[] inputStringArrayArg){
         String directionString = inputStringArrayArg[1].toUpperCase();

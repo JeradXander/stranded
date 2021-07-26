@@ -1,12 +1,8 @@
 package sample;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Objects;
 
-import com.game.Main;
 import javafx.application.Application;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 import sample.views.ViewManager;
 import javafx.scene.media.Media;
@@ -29,6 +25,7 @@ public class MenuMain extends Application {
     public static MediaPlayer fxmediaPlayer;
     public static MediaPlayer laserMediaPlayer;
     public  static MediaPlayer clickMediaPlayer;
+    public  static MediaPlayer launchMediaPlayer;
     public void music() {
         // String s = "src/sample/views/resources/intro.wav";
         // String path = Paths.get(s).toUri().toString();
@@ -57,6 +54,12 @@ public class MenuMain extends Application {
         Media clk = new Media(clickPath);
         clickMediaPlayer = new MediaPlayer(clk);
         clickMediaPlayer.setVolume(5 * 0.01);
+
+        String launchPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("launchSound.mp3")).toExternalForm();
+        Media lnc = new Media(launchPath);
+        launchMediaPlayer = new MediaPlayer(lnc);
+        launchMediaPlayer.setVolume(5 * 0.01);
+
 
     }
 
