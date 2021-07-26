@@ -21,6 +21,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import sample.MenuMain;
 import sample.models.ASTRO;
@@ -125,6 +127,7 @@ public class ViewManager {
         });
     }
 
+//    Create subscene
     private void createchooseSubscene(){
         astroChooserScene = new StrandedSubScene();
         InfoLabel astroLabel = new InfoLabel("CHOOSE ASTRO:\nLEFT: SOLDIER MIDDLE: MEDIC RIGHT: EXPLORER");
@@ -159,6 +162,7 @@ public class ViewManager {
         });
     }
 
+//    Choose astronaut
     private HBox astroToChoose(){
 
         HBox box = new HBox();
@@ -288,10 +292,13 @@ public class ViewManager {
     }
 
     private void createHelpButton(){
-
+//        Font font = new Font(120);
         StrandedButton helpButton = new StrandedButton("HELP");
         InfoLabel helpLabel = new InfoLabel("Game Help");
-        InfoLabel help = new InfoLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
+        InfoLabel help = new InfoLabel("Type Commands to Play the Game. \n\nMove: Go + Direction 'North, East, South, West'\n\n" +
+        "Grab Item: Grab + Item/Weapon/Food \n\nInspect Surroundings: Search + here/area name \n\nDrop Item: Drop + item \n\n" +
+        "Use Item: Use/Eat + Item/Weapon/Food \n\nPress the Map button to check the Map. If you don't remember the commands use similar words");
+        help.setFont(Font.font("Verdana", 16));
         helpLabel.setUnderline(true);
         helpLabel.setLayoutY(-160);
         helpLabel.setTextForTitle();
