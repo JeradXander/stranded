@@ -83,8 +83,8 @@ public class Controller {
     public void setSendCommand() throws IOException, InterruptedException {
         fxCurrentLocation.setText(currentLocation);
         System.out.println(planet1.get("description"));
-        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
-        fxDescription.setText(fxCurrLocation.get("Description"));
+//        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
+//        fxDescription.setText(fxCurrLocation.get("Description"));
 //        HashMap<String, Integer> fxPlayerHP = fxDisplayPlayer();
 
     }
