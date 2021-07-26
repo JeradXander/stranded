@@ -443,7 +443,7 @@ public class GameViewManager {
             displayTextSubScene.getAnchorPane().getChildren().add(descriptionText);
 
         //inventory
-        displayInventory = new Label("Inventory: " + playerCreated.viewInventory());
+        displayInventory = new Label("Inventory:  " + playerCreated.viewInventory());
         displayInventory.setLayoutX(25);
         displayInventory.setLayoutY(350);
         displayTextSubScene.getAnchorPane().getChildren().add(displayInventory);
