@@ -17,12 +17,16 @@ import com.game.startmenu.Status;
 import com.game.textparser.Directions;
 import com.game.world.GameWorld;
 import com.game.world.Location;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
@@ -37,7 +41,10 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import sample.GameController;
 import sample.MenuMain;
 import sample.models.*;
 
@@ -51,6 +58,9 @@ public class GameViewManager {
     private static final int MENU_BUTTONS_START_X = 100;
     private static final int MENU_BUTTONS_START_Y = 225;
     BackgroundImage background;
+    private SmallHelpSubScene gameHelpSubscene;
+
+
 
     private ArrayList<StrandedButton> buttonList;
     private ArrayList<AstroPicker> astroList;
@@ -135,12 +145,14 @@ public class GameViewManager {
         createBackGround();
 //
         creatMapButton();
+
         createSubmitTextButton();
 //
         createSlider();
         createTextScene();
         createTextField();
 
+        createHelpButton();
         MenuMain.fxmediaPlayer.play();
 
     }
@@ -154,21 +166,14 @@ public class GameViewManager {
         creditSubscene = new StrandedSubScene();
         mainPane.getChildren().add(creditSubscene);
 
-//        helpSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(helpSubscene);
-//
-//        playSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(playSubscene);
-//
-//        scoreSubscene = new StrandedSubScene();
-//        mainPane.getChildren().add(scoreSubscene);
-
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
 
         mapSubscene = new SmallStrandedSubScene();
         mainPane.getChildren().add(mapSubscene);
 
+        gameHelpSubscene = new SmallHelpSubScene();
+        mainPane.getChildren().add(gameHelpSubscene);
     }
 
     private void createSlider(){
@@ -181,6 +186,7 @@ public class GameViewManager {
                 MenuMain.fxmediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 MenuMain.laserMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 MenuMain.clickMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
+                MenuMain.launchMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 System.out.println("volume" + volumeControl.getValue());
             }
         });
@@ -245,9 +251,31 @@ public class GameViewManager {
 
 
         if(playerCreated.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
-            Travel.goToAnotherPlanet();
-            Travel.lowFuelWarning();
-            GameWorld.setCurrentLocation("Landing Site");
+
+            MenuMain.launchMediaPlayer.play();
+            background = new BackgroundImage(new Image("sample/models/resources/shuttle.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                             BackgroundPosition.DEFAULT,null);
+            mainPane.setBackground(new Background(background));
+            descriptionText.setText("\"Hmmmm....I think I have enough supplies to fix the craft and now\n" +
+                                    "Fixing spacecraft...\n" +
+                                    "Take OFF\n" +
+                                    "Landed");
+
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(7), new EventHandler<ActionEvent>() {
+
+
+                @Override
+                public void handle(ActionEvent event) {
+
+
+                    GameWorld.setCurrentLocation("Landing Site");
+                    setMapImage(GameWorld.getCurrentLocation());
+                    locationText.setText(GameWorld.getCurrentLocation());
+
+                }
+            }));
+            timeline.play();
+
         }
 
         if(playerCreated.getHP() == 0){
@@ -369,6 +397,17 @@ public class GameViewManager {
                 background = new BackgroundImage(new Image("sample/models/resources/backs/abandonedStorage.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
                                                  BackgroundPosition.DEFAULT, null);
                 map.setImage(new Image("sample/models/resources/maps/abandonedStorageFacility.png"));
+                map.setFitWidth(250);
+                map.setPreserveRatio(true);
+                map.setLayoutX(25);
+                map.setLayoutY(25);
+                mapSubscene.getAnchorPane().getChildren().add(map);
+                mainPane.setBackground(new Background(background));
+                break;
+            case "Abandoned Ship":
+                background = new BackgroundImage(new Image("sample/models/resources/backs/abandonedShip.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
+                map.setImage(new Image("sample/models/resources/maps/abandonedShip.png"));
                 map.setFitWidth(250);
                 map.setPreserveRatio(true);
                 map.setLayoutX(25);
@@ -632,6 +671,55 @@ public class GameViewManager {
             }
         });
     }
+
+    private void createHelpButton(){
+        StrandedButton helpButton = new StrandedButton("HELP");
+
+        InfoLabelSmall help = new InfoLabelSmall("Type Commands to Play the Game. \n\nMove: Go + Direction 'North, East, South, West'\n\n" +
+                                       "Grab Item: Grab + Item/Weapon/Food \n\nInspect Surroundings: Search + here/area name \n\nDrop Item: Drop + item \n\n" +
+                                       "Use Item: Use/Eat + Item/Weapon/Food \n\nPress the Map button to check the Map. If you don't remember the commands use similar words");
+        help.setFont(Font.font("Verdana", 12));
+
+        help.setLayoutX(10);
+        help.setLayoutY(5);
+
+
+
+
+
+
+
+
+        //gameHelpSubscene = new SmallHelpSubScene();
+        helpButton.setLayoutX(475);
+        helpButton.setLayoutY(725);
+
+        gameHelpSubscene.getHelpAnchorPane().getChildren().add(help);
+        gameHelpSubscene.getHelpAnchorPane().getChildren().add(helpButton);
+        mainPane.getChildren().add(helpButton);
+        helpButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                MenuMain.clickMediaPlayer.stop();
+                MenuMain.clickMediaPlayer.play();
+                if (!gameHelpSubscene.helpIsHidden()){
+                     gameHelpSubscene.hideHelpSubScene();
+                } else {
+                    gameHelpSubscene.showHelpSubScene();
+                }
+            }
+        });
+        helpButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                DropShadow dropshad = new DropShadow();
+                dropshad.setColor(Color.ORANGE);
+                helpButton.setEffect(dropshad);
+            }
+        });
+    }
+
+
 
     private void createTextScene() throws IOException, InterruptedException {
         displayTextSubScene = new GameStrandedSubScene();
