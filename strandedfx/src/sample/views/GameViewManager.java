@@ -1,7 +1,20 @@
 package sample.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.player.Player;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import com.game.startmenu.Status;
+import com.game.textparser.Directions;
+import com.game.world.GameWorld;
+import com.game.world.Location;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,10 +22,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -23,11 +41,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import sample.MenuMain;
-import sample.models.ASTRO;
-import sample.models.AstroPicker;
-import sample.models.InfoLabel;
-import sample.models.StrandedButton;
-import sample.models.StrandedSubScene;
+import sample.models.*;
+
+import static com.game.world.GameWorld.currentLocation;
 
 
 public class GameViewManager {
@@ -47,27 +63,53 @@ public class GameViewManager {
     private StrandedSubScene scoreSubscene;
     private StrandedSubScene playSubscene;
     private StrandedSubScene astroChooserScene;
+    private SmallStrandedSubScene mapSubscene;
+    private GameStrandedSubScene displayTextSubScene;
 
+    private TextField textField;
+    private StrandedButton submitButton;
 
+    private ImageView map;
 
 
     private AnchorPane mainPane;
     private Scene mainScene;
     private Stage mainStage;
 
+    private GameWorld ourGame;
+    private HashMap<String, Location> planet1;
 
-    public GameViewManager(Player playerCreated){
+    private Label displayText;
+    private Label descriptionText;
+
+//    User input variables
+    private String moveDirection = "nowhere";
+    private String itemGrabbed = "nothing";
+    private String useItemGrabbed = "nothing";
+    private String locationToSearch = "here";
+    private String itemDropped = "none";
+    private Player playerCreated;
+    private Status status;
+
+// Constructor
+    public GameViewManager(Player _playerCreated) throws IOException, InterruptedException {
+         ourGame = new GameWorld();
+         planet1 = ourGame.getPlanet1();
+         status = new Status();
+         playerCreated =  _playerCreated;
+
         buttonList = new ArrayList<>();
         //creating main window to hold all children
         mainPane = new AnchorPane();
         mainScene = new Scene(mainPane, WIDTH, HEIGHT, Color.RED);
         mainStage = new Stage();
+
         //setting scene
         mainStage.setScene(mainScene);
 
         mainStage.setResizable(false);
 
-        mainStage.setTitle(playerCreated.getName() + "special: " );
+        mainStage.setTitle("Name: " + playerCreated.getName() + "  | Astronaut Class: " + playerCreated.getAstronautClass() + "  | Current Location: " + currentLocation);
 
         createSubscenes();
 
@@ -77,14 +119,36 @@ public class GameViewManager {
 //        //creating Background from method
         createBackGround();
 //
-        createLogo();
+        creatMapButton();
+        createSubmitTextButton();
 //
-//        createSlider();
+        createSlider();
+        createTextScene();
+        createTextField();
+//        createLabel();
+
+
+        MenuMain.fxmediaPlayer.play();
+
 //
 //        createchooseSubscene();
 //
 //        StrandedSubScene subscene = new StrandedSubScene();
 //        mainPane.getChildren().add(subscene);
+
+
+//        Start Game Method/logic
+        if (playerCreated.getAstronautClass().equals("Medic")){
+            //Player.addItem(Item med-pack);
+            Location medpacks = planet1.get("Starting Items");
+            playerCreated.move("Starting Items");
+            status.action(new String[] {"grab", "med-pack"});
+
+            System.out.println("As the medic you start out with five med-packs!");
+            playerCreated.move("Crash Site");
+            playerCreated.setHP(100);
+        }
+
     }
 
     //method to get main stage
@@ -108,6 +172,9 @@ public class GameViewManager {
         astroChooserScene = new StrandedSubScene();
         mainPane.getChildren().add(astroChooserScene);
 
+        mapSubscene = new SmallStrandedSubScene();
+        mainPane.getChildren().add(mapSubscene);
+
     }
 
     private void createSlider(){
@@ -117,77 +184,141 @@ public class GameViewManager {
         volumeControl.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number t1) {
-                MenuMain.mediaPlayer.setVolume(volumeControl.getValue() * 0.01);
-
+                MenuMain.fxmediaPlayer.setVolume(volumeControl.getValue() * 0.01);
+                MenuMain.laserMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
+                MenuMain.clickMediaPlayer.setVolume(volumeControl.getValue() * 0.01);
                 System.out.println("volume" + volumeControl.getValue());
             }
         });
     }
 
-    private void createchooseSubscene(){
-        astroChooserScene = new StrandedSubScene();
-        InfoLabel astroLabel = new InfoLabel("CHOOSE ASTRO:\nLEFT: SOLDIER MIDDLE: MEDIC RIGHT: EXPLORER");
-        astroLabel.setAlignment(Pos.CENTER);
+    private void createTextField(){
 
-        mainPane.getChildren().add(astroChooserScene);
-        StrandedButton startButton = new StrandedButton("START");
-        startButton.setLayoutY(150);
-        startButton.setLayoutX(210);
-        astroLabel.setLayoutY(-100);
-        astroChooserScene.getAnchorPane().getChildren().add(astroToChoose());
-        astroChooserScene.getAnchorPane().getChildren().add(astroLabel);
-      astroChooserScene.getAnchorPane().getChildren().add(startButton);
-
-        startButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        textField = new TextField();
+        textField.setLayoutX(700);
+        textField.setLayoutY(675);
+        textField.setPrefSize(250, 40);
+        mainPane.getChildren().add(textField);
+//        textField.setOnInputMethodTextChanged(new EventHandler<InputMethodEvent>() {
+//            @Override
+//            public void handle(InputMethodEvent inputMethodEvent) {
+//                MenuMain.laserMediaPlayer.play();
+//            }
+//        });
+        textField.textProperty().addListener(new ChangeListener<String>() {
             @Override
-            public void handle(MouseEvent mouseEvent) {
-                System.out.println("clicked");
-
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                System.out.println("text changed");
+                MenuMain.laserMediaPlayer.stop();
+                MenuMain.laserMediaPlayer.play();
             }
         });
-    }
 
-    private HBox astroToChoose(){
+        textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode().equals(KeyCode.ENTER))
+                {
+                    try {
+                        startParsing(textField.getText());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("success!");
 
-        HBox box = new HBox();
-        box.setSpacing(40);
-        astroList = new ArrayList<>();
-        for(ASTRO astro: ASTRO.values()){
-            System.out.println(astro);
-            AstroPicker astroToPick = new AstroPicker(astro);
-            astroList.add(astroToPick);
-            box.getChildren().add(astroToPick);
-
-            astroToPick.setOnMouseClicked(mouseEvent -> {
-                for(AstroPicker astros : astroList){
-                    astros.setIsBoxChecked(false);
                 }
-                astroToPick.setIsBoxChecked(true);
-                chosenAstro = astroToPick.getAstro();
-            });
+            }
+        });
+
+    }
+
+    private void startParsing(String input) throws IOException {
+        System.out.println(input);
+        input.toLowerCase();
+        String [] actionArray = action(input);
+
+
+    }
+
+    public String[] action(String playerControlString) throws IOException {
+        /*Takes user input and it processes what type of action you are trying to take */
+        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        Map<String,ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        myMap = objectMapper.readValue(mapData, HashMap.class);
+
+
+        System.out.println("Perform an action: ");
+        String[] inputStringArray = playerControlString.split(" ", 3);
+        String[] invalidArray = {"NOT", "VALID"};
+
+        if(inputStringArray.length != 2){
+            return invalidArray;
         }
-        box.setLayoutX(400 - (110*2));
-        box.setLayoutY(275);
-        return box;
+
+        if(myMap.get("go").contains(inputStringArray[0])){
+            inputStringArray[0] = "go";
+            inputStringArray[1] = move(inputStringArray);
+        } else if (myMap.get("grab").contains(inputStringArray[0])){
+            inputStringArray[0] = "grab";
+            inputStringArray[1] = grabItem(inputStringArray);
+        }else if (myMap.get("use").contains(inputStringArray[0])){
+            inputStringArray[0] = "use";
+            inputStringArray[1] = useItem(inputStringArray);
+        } else if (myMap.get("search").contains(inputStringArray[0])) {
+            inputStringArray[0] = "search";
+            inputStringArray[1] = search(inputStringArray);
+        } else if (myMap.get("drop").contains(inputStringArray[0])){
+            inputStringArray[0] = "drop";
+            inputStringArray[1] = dropItem(inputStringArray);
+        } else {
+            return invalidArray;
+        }
+
+        return inputStringArray;
     }
 
 
-    private void createSTARTButtons(){
-        StrandedButton button = new StrandedButton("Play");
-        mainPane.getChildren().add(button);
 
-        button.setLayoutX(200);
-        button.setLayoutY(300);
+    private void createSubmitTextButton(){
+        submitButton = new StrandedButton("SEND COMMAND");
+//        submitButton.setMaxWidth(200);
+        submitButton.setLayoutX(725);
+        submitButton.setLayoutY(725);
+        //addMenuButton(submitButton);
+        submitButton.setButtonFontForLongText();
+        mainPane.getChildren().add(submitButton);
+
+
+        submitButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                MenuMain.clickMediaPlayer.stop();
+                MenuMain.clickMediaPlayer.play();
+
+                try {
+                    startParsing(textField.getText());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        submitButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                DropShadow dropshad = new DropShadow();
+
+                dropshad.setColor(Color.ORANGE);
+                submitButton.setEffect(dropshad);
+            }
+        });
+
+
     }
 
 
-    private void addMenuButton(StrandedButton button){
-
-        button.setLayoutY(MENU_BUTTONS_START_Y + buttonList.size() * 100);
-        button.setLayoutX(MENU_BUTTONS_START_X);
-        buttonList.add(button);
-        mainPane.getChildren().add(button);
-    }
 
     private void createButton(){
 
@@ -198,131 +329,21 @@ public class GameViewManager {
         createExitButton();
     }
 
-    private void createPlayButton(){
-        StrandedButton playButton = new StrandedButton("PLAY");
-        StrandedButton newGameButton = new StrandedButton("NEW GAME");
-        StrandedButton continueGame = new StrandedButton("CONTINUE GAME");
-
-        newGameButton.setLayoutX(200);
-        newGameButton.setLayoutY(150);
-
-        continueGame.setLayoutX(200);
-        continueGame.setLayoutY(225);
-        continueGame.setButtonFontForLongText();
-
-        playSubscene.getAnchorPane().getChildren().add(newGameButton);
-        playSubscene.getAnchorPane().getChildren().add(continueGame);
-        addMenuButton(playButton);
-
-        playButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                showAndHideSubscenes(playSubscene);
-            }
-        });
-
-        newGameButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-
-
-                showAndHideSubscenes(astroChooserScene);
-//                Stage primaryStage = new Stage();
-//                //Group root = new Group();
-//                Parent root = null;
-//                try {
-//                    root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../chooseAstronauts.fxml")));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                Scene chooseAstronauts = new Scene(root, Color.BLACK);
-//
-//                primaryStage.setTitle("Choose your Astronaut");
-//                primaryStage.setResizable(false);
-//                primaryStage.setScene(chooseAstronauts);
-//                primaryStage.setWidth(WIDTH);
-//                primaryStage.setHeight(HEIGHT);
-//
-//                primaryStage.show();
-//                MenuMain.mediaPlayer.stop();
-            }
-        });
-
-
-    }
-
-    private void createScoreButton(){
-        StrandedButton scoreButton = new StrandedButton("SCORE");
-        addMenuButton(scoreButton);
-        InfoLabel scoreLabel = new InfoLabel("Game Help");
-        InfoLabel score = new InfoLabel("1. Name: Jerad: Health-80\n2. Name: Jerad: Health-79\n3.0 Name: Jerad: Health-78\n4.0 Name: Jerad: Health-30\n");
-        scoreLabel.setUnderline(true);
-        scoreLabel.setLayoutY(-160);
-        scoreLabel.setTextForTitle();
 
 
 
-        scoreSubscene.getAnchorPane().getChildren().add(scoreLabel);
-        scoreSubscene.getAnchorPane().getChildren().add(score);
 
 
-        scoreButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                showAndHideSubscenes(scoreSubscene);
-            }
-        });
-    }
-
-    private void createHelpButton(){
-
-        StrandedButton helpButton = new StrandedButton("HELP");
-        InfoLabel helpLabel = new InfoLabel("Game Help");
-        InfoLabel help = new InfoLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
-        helpLabel.setUnderline(true);
-        helpLabel.setLayoutY(-160);
-        helpLabel.setTextForTitle();
-
-        helpSubscene.getAnchorPane().getChildren().add(helpLabel);
-        helpSubscene.getAnchorPane().getChildren().add(help);
-        addMenuButton(helpButton);
-
-        helpButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                showAndHideSubscenes(helpSubscene);
-            }
-        });
-    }
-
-    private void createCreditsButton(){
-
-        StrandedButton credButton = new StrandedButton("CREDITS");
-        InfoLabel creditLabel = new InfoLabel("Game Credits");
-        InfoLabel names = new InfoLabel(" \n\nDamian Mercado\n\nDan Lasche\n\nJerad Alexander");
-        creditLabel.setUnderline(true);
-        creditLabel.setLayoutY(-160);
-        creditLabel.setTextForTitle();
 
 
-//        creditLabel.setLayoutX();
-        creditSubscene.getAnchorPane().getChildren().add(creditLabel);
-        creditSubscene.getAnchorPane().getChildren().add(names);
+//    credit button main menu
 
-        addMenuButton(credButton);
-
-
-        credButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                showAndHideSubscenes(creditSubscene);
-            }
-        });
-    }
 
     private void createExitButton(){
         StrandedButton exitButton = new StrandedButton("EXIT");
-        addMenuButton(exitButton);
+        mainPane.getChildren().add(exitButton);
+        exitButton.setLayoutY(725);
+        exitButton.setLayoutX(25);
 
         exitButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -333,7 +354,7 @@ public class GameViewManager {
             }
         });
     }
-
+// Crashsite
     private void createBackGround(){
         Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
         BackgroundImage background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -342,29 +363,74 @@ public class GameViewManager {
         mainPane.setBackground(new Background(background));
     }
 
-    private void createLogo(){
-        ImageView logo = new ImageView("sample/views/resources/mapplaceholder.png");
-        logo.setLayoutX(775);
-        logo.setLayoutY(20);
-        logo.setFitWidth(250);
-        logo.setPreserveRatio(true);
+//    Map placeholder
+    private void creatMapButton(){
+        StrandedButton mapButton = new StrandedButton("MAP");
+        map = new ImageView("sample/models/resources/maps/crashSite.png");
+        map.setFitWidth(250);
+        map.setPreserveRatio(true);
+        map.setLayoutX(25);
+        map.setLayoutY(25);
+        mapButton.setLayoutX(250);
+        mapButton.setLayoutY(725);
 
-        logo.setOnMouseEntered(new EventHandler<MouseEvent>() {
+        mapSubscene.getAnchorPane().getChildren().add(mapButton);
+        mapSubscene.getAnchorPane().getChildren().add(map);
+
+        mainPane.getChildren().add(mapButton);
+
+
+        mapButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                MenuMain.clickMediaPlayer.stop();
+                MenuMain.clickMediaPlayer.play();
+                if (!mapSubscene.isHidden()){
+                    mapSubscene.hideSubScene();
+
+                } else {
+                    mapSubscene.showSubScene();
+                }
+            }
+        });
+
+        mapButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 DropShadow dropshad = new DropShadow();
 
                 dropshad.setColor(Color.ORANGE);
-                logo.setEffect(dropshad);
+                mapButton.setEffect(dropshad);
             }
         });
-        logo.setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                logo.setEffect(null);
-            }
-        });
-        mainPane.getChildren().add(logo);
+    }
+
+    private void createTextScene() throws IOException, InterruptedException {
+        displayTextSubScene = new GameStrandedSubScene();
+
+            //This is to display all the game text
+            displayText = new Label("Participate in the activities associated with the design, development, and support for \n" +
+                    "PeopleSoft implementation or upgrade projects. Provide engagement delivery services both \n" +
+                    "as an individual and as a team member. Services include identifying needs, developing, \n" +
+                    "influencing, and implementing proposals. Able to lead, support, and participate in project \n" +
+                    "teams to ensure system and business requirements are clearly documented and understood. \n" +
+                    "This position requires the ability to manage multiple tasks and link those tasks to business \n" +
+                    "initiatives. Familiarity with all aspects of the software development life cycle and expertise in \n" +
+                    "utilizing software implementation methodology based on industry best practices. Must be \n" +
+                    "willing to travel (if required by customer)");
+            displayText.setLayoutX(25);
+            displayText.setLayoutY(25);
+            displayTextSubScene.getAnchorPane().getChildren().add(displayText);
+            displayText.setText("Location: " + currentLocation);
+        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
+            descriptionText = new Label("Description: " + fxCurrLocation.get("Description"));
+            descriptionText.setMaxWidth(350);
+            descriptionText.setWrapText(true);
+            descriptionText.setLayoutX(25);
+            descriptionText.setLayoutY(50);
+            displayTextSubScene.getAnchorPane().getChildren().add(descriptionText);
+
+        mainPane.getChildren().add(displayTextSubScene);
     }
 
     private void showAndHideSubscenes(StrandedSubScene subScene){
@@ -376,4 +442,90 @@ public class GameViewManager {
 
         sceneThatNeedsToSlide = subScene;
     }
+
+    //
+    //
+    //
+    //
+    //  User Input Section
+    public String move(String[] inputStringArrayArg){
+        String directionString = inputStringArrayArg[1].toUpperCase();
+        if(!directionString.equals("NORTH") && !directionString.equals("SOUTH") && !directionString.equals("EAST") && !directionString.equals("WEST")){
+            return moveDirection;
+        }
+
+        for(Directions direction: Directions.values()){
+            if(direction.equals(Directions.valueOf(directionString))){
+                moveDirection = inputStringArrayArg[1];
+            }
+        }
+        return moveDirection;
+    }
+
+
+    public String grabItem(String[] inputStringArrayArg){
+        itemGrabbed = inputStringArrayArg[1];
+        return itemGrabbed;
+    }
+
+    //Need to update on commands engine
+    public String useItem(String[] inputStringArrayArg){
+        String inventoryString = playerCreated.viewInventory().toString();
+        if(inventoryString.contains(inputStringArrayArg[1])){
+            useItemGrabbed = inputStringArrayArg[1];
+        } else {
+            useItemGrabbed = "";
+        }
+
+        return useItemGrabbed;
+
+    }
+
+    //needs validation?
+    public String search(String[] inputStringArrayArg){
+        return locationToSearch;
+    }
+
+    //Validation handled by status
+    public String dropItem(String[] inputStringArray) {
+        String inventoryString = playerCreated.viewInventory().toString();
+        if (inventoryString.contains(inputStringArray[1])) {
+            itemDropped = inputStringArray[1];
+        } else {
+            itemDropped = "";
+        }
+        return itemDropped;
+    }
+
+//    public boolean playAgain(){
+//        boolean askForReplay = true;
+//        int userNum = 0;
+//        while (askForReplay){
+//            System.out.println("Would you like to play Stranded again?");
+//            System.out.println("Please enter the number for your choice");
+//            System.out.println("1) Yes\n2) No");
+//
+//            try {
+////                String userString = input.nextLine();
+//                userNum = Integer.parseInt(userString);
+//
+//                if(userNum > 0 && userNum < 3){
+//                    askForReplay = false;
+//                    break;
+//                } else {
+//                    System.out.println("Invalid Choice");
+//                    System.out.println("====================");
+//                }
+//
+//            } catch (Exception e){
+//                System.out.println("Invalid Choice");
+//                System.out.println("====================");
+//            }
+//        }
+//
+//        return userNum == 1;
+//
+//
+//    }
+
 }

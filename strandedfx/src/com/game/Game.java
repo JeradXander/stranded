@@ -95,8 +95,8 @@ public class Game {
         String playerName = UserInput.setPlayerName();
         System.out.println("Welcome Commander " + playerName);
 
-        String[] actionTest = UserInput.action();
-        System.out.println("The action you entered is: " + actionTest[0] + " " + actionTest[1]);
+//        String[] actionTest = UserInput.action();
+//        System.out.println("The action you entered is: " + actionTest[0] + " " + actionTest[1]);
 
         // David Test
         StartMenu game2 = new StartMenu();

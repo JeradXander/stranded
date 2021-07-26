@@ -1,6 +1,8 @@
 package sample.views;
 
 import com.game.player.Player;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
@@ -11,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -78,6 +81,7 @@ public class ViewManager {
 
         createchooseSubscene();
 
+
         StrandedSubScene subscene = new StrandedSubScene();
         mainPane.getChildren().add(subscene);
     }
@@ -106,7 +110,7 @@ public class ViewManager {
 
 
     }
-
+// Volume slider
     private void createSlider(){
         Slider volumeControl = new Slider(0, 100, 5);
 
@@ -139,8 +143,13 @@ public class ViewManager {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 System.out.println("clicked");
-
-                GameViewManager manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
+                MenuMain.mediaPlayer.stop();
+                GameViewManager manager = null;
+                try {
+                    manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mainStage = manager.getMainStage();
                 // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
 //                mainStage.setTitle("GameView");
@@ -248,7 +257,7 @@ public class ViewManager {
 //                primaryStage.setHeight(HEIGHT);
 //
 //                primaryStage.show();
-//                MenuMain.mediaPlayer.stop();
+//                MenuMain.gameMediaPlayer.stop();
             }
         });
 
