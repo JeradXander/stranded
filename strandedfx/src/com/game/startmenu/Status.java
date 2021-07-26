@@ -24,8 +24,10 @@ public class Status {
 
     //Methods for actions
 
-    public void action(String[] command) throws IllegalArgumentException{
+public void action(String[] command, Player _player) throws IllegalArgumentException{
     //command[0] is action, command[1] is direction/item/etc.
+
+    player = _player;
 
         //Initialize variables for action logic
         String currentLoc = GameWorld.getCurrentLocation();
@@ -33,7 +35,7 @@ public class Status {
         ArrayList<Item> inventoryArray = inventoryMap.get(currentLoc);
         HashMap<String, ArrayList<Item>> hiddenItemsMap = GameWorld.getHiddenItems();
         ArrayList<Item> hiddenItemsArray = hiddenItemsMap.get(currentLoc);
-        ArrayList<Item> playerItems = player.getInventory();
+        ArrayList<Item> playerItems = _player.getInventory();
 
         if (currentLoc == null || currentLoc.equals("")) {
             currentLoc = GameWorld.getPreviousLocation();
@@ -49,7 +51,7 @@ public class Status {
 
             // new method for moving player
             if (!nextLoc.equals(currentLoc)) { //This will prevent move method being called, so HP won't be penalized.
-                player.move(nextLoc);
+                _player.move(nextLoc);
             }
             //setResult("Moving is tiring and HP draining on this planet..");
         }
@@ -61,7 +63,7 @@ public class Status {
             Item removeItem = null;
             for(Item item: inventoryArray){
                 if(item.getItemName().equals(command[1])){
-                    player.addItem(item);
+                    _player.addItem(item);
                     removeItem = item;
                     setResult(item.getItemName() + " grabbed! " + item.getDescription());
                 } else {
@@ -128,7 +130,7 @@ public class Status {
 
                 if (usedItem.getType().equals("food")) {
 
-                    player.eat(usedItem);
+                    _player.eat(usedItem);
 
                     setResult(command[1] + " used!");
                 }
