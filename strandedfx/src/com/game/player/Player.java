@@ -24,7 +24,7 @@ public class Player {
     private static int attack;
     private static ArrayList<Item> inventory = new ArrayList<Item>();
     private static int movePenalty = -10;
-    public static String astronautClass = "Medic";
+    public static String astronautClass = "";
     public static boolean firstCombat = true;
 
 
@@ -248,7 +248,7 @@ public class Player {
         return movePenalty;
     }
 
-    private void setMovePenalty() {
+    public void setMovePenalty() {
         //Set based on current player HP
         if (getHP() < 50 && astronautClass.equals("Explorer") ) {
             movePenalty = -2;

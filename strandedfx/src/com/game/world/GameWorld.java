@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 public class GameWorld {
@@ -28,7 +29,8 @@ public class GameWorld {
     private void createGameAssets() throws IOException{
         //Load our locations from planet1.json file into array of location objects
 
-        byte[] locationData = Files.readAllBytes(Paths.get("resources/planet1.json"));
+        byte[] locationData = Files.readAllBytes(Paths.get("src/resources/planet1.json"));
+        //byte[] locationData = Files.readAllBytes(Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("planet1.json")).toExternalForm()));
         ObjectMapper objectMapper = new ObjectMapper();
         Location[] location = objectMapper.readValue(locationData, Location[].class);
 
@@ -38,7 +40,9 @@ public class GameWorld {
             planet1.put(loc.getName(), loc);
         }
         //Create Array of Items from JSON
-        byte[] itemData = Files.readAllBytes(Paths.get("resources/items.json"));
+//        byte[] itemData = Files.readAllBytes(Paths.get("resources/items.json"));
+        byte[] itemData = Files.readAllBytes(Paths.get("src/resources/items.json"));
+       // byte[] itemData = Files.readAllBytes(Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("items.json")).toExternalForm()));
         Item[] itemsArray = objectMapper.readValue(itemData,Item[].class);
 
         //Create our hashmap to hold our Array List for game items
@@ -58,7 +62,11 @@ public class GameWorld {
         }
 
         //Create Hidden Items hashmap
-        byte[] hiddenItemData = Files.readAllBytes(Paths.get("resources/hidden.json"));
+
+        byte[] hiddenItemData = Files.readAllBytes(Paths.get("src/resources/hidden.json"));
+
+      // byte[] hiddenItemData = Files.readAllBytes(Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("hidden.json")).toExternalForm()));
+
         Item[] hiddenItemsArray = objectMapper.readValue(hiddenItemData,Item[].class);
 
         hiddenItems = new HashMap<>(numberOfLocations);

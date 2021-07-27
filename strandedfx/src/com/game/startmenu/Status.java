@@ -16,7 +16,7 @@ public class Status {
     private String noun = "";
     private String result = "";
 
-    Player player = new Player("david", "Medic");
+    Player player;
 
     GameViewManager gameViewManager;
 
@@ -152,43 +152,43 @@ public void action(String[] command, Player _player, GameViewManager _gameViewMa
         setAction(command[0]);
         setNoun(command[1]);
     }
-
-    public void display() throws InterruptedException, IOException {
-        clearConsole();
-        String currentLoc = GameWorld.getCurrentLocation();
-        if (currentLoc == null || currentLoc.equals("")) {
-            currentLoc = GameWorld.getPreviousLocation();
-        }
-        Combat combat = null;
-        if (currentLoc.contains("Alien Compound")) {
-            combat = new Combat();
-        }
-        Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
-
-//        gameViewManager.locationText.setText(currentLocData.getName());
 //
-//        gameViewManager.descriptionText.setText("===================================================\n" +
-//                                                "Description: \" +  currentLocData.getDescription()\n" +
-//                                                "Items you see: " + GameWorld.getItemsByLocation(currentLoc)+
-//                                                "===================================================\n" +
-//                                                "" );
-
-        System.out.println("===================================================");
-        System.out.println("Location: " + currentLocData.getName());
-        System.out.println("===================================================");
-        System.out.println("Description: " +  currentLocData.getDescription());
-        System.out.println("\n");
-        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
-        System.out.println("===================================================");
-        System.out.println("Name: " + "dan" + " | HP: " + player.getHP() + " / " + player.getMaxHp());
-        //Player.getName()
-        System.out.println("Current Inventory: " + player.viewInventory());
-        System.out.println("---------------------------------------------------");
-        System.out.println("Last action taken: " + getAction() + " "+ getNoun());
-        System.out.println(getResult()); //Display action results
-        setResult(""); //Reset action results for next action
-
-    }
+//    public void display() throws InterruptedException, IOException {
+//        clearConsole();
+//        String currentLoc = GameWorld.getCurrentLocation();
+//        if (currentLoc == null || currentLoc.equals("")) {
+//            currentLoc = GameWorld.getPreviousLocation();
+//        }
+//        Combat combat = null;
+//        if (currentLoc.contains("Alien Compound")) {
+////            combat = new Combat();
+//        }
+//        Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
+//
+////        gameViewManager.locationText.setText(currentLocData.getName());
+////
+////        gameViewManager.descriptionText.setText("===================================================\n" +
+////                                                "Description: \" +  currentLocData.getDescription()\n" +
+////                                                "Items you see: " + GameWorld.getItemsByLocation(currentLoc)+
+////                                                "===================================================\n" +
+////                                                "" );
+//
+//        System.out.println("===================================================");
+//        System.out.println("Location: " + currentLocData.getName());
+//        System.out.println("===================================================");
+//        System.out.println("Description: " +  currentLocData.getDescription());
+//        System.out.println("\n");
+//        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
+//        System.out.println("===================================================");
+//        System.out.println("Name: " + "dan" + " | HP: " + player.getHP() + " / " + player.getMaxHp());
+//        //Player.getName()
+//        System.out.println("Current Inventory: " + player.viewInventory());
+//        System.out.println("---------------------------------------------------");
+//        System.out.println("Last action taken: " + getAction() + " "+ getNoun());
+//        System.out.println(getResult()); //Display action results
+//        setResult(""); //Reset action results for next action
+//
+//    }
 
     //method to send info to javafx
     public HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
@@ -199,17 +199,10 @@ public void action(String[] command, Player _player, GameViewManager _gameViewMa
         }
         Combat combat = null;
         if (currentLoc.contains("Alien Compound")) {
-            combat = new Combat();
+        //    combat = new Combat();
         }
         Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
 
-        System.out.println("===================================================");
-        System.out.println("Location: " + currentLocData.getName());
-        System.out.println("===================================================");
-        System.out.println("Description: " +  currentLocData.getDescription());
-        System.out.println("\n");
-        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
-        System.out.println("===================================================");
         fxLocationHMap.put("Location", currentLocData.getName());
         fxLocationHMap.put("Description", currentLocData.getDescription());
         fxLocationHMap.put("Items", GameWorld.getItemsByLocation(currentLoc).toString());

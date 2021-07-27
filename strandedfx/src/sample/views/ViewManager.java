@@ -148,8 +148,9 @@ public class ViewManager {
                 System.out.println("clicked");
                 MenuMain.mediaPlayer.stop();
                 GameViewManager manager = null;
+                String type = chosenAstro.name();
                 try {
-                    manager = new GameViewManager(new Player("Jerad",chosenAstro.name()));
+                    manager = new GameViewManager(new Player("Matt Damon",type));
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -228,7 +229,7 @@ public class ViewManager {
         continueGame.setButtonFontForLongText();
 
         playSubscene.getAnchorPane().getChildren().add(newGameButton);
-        playSubscene.getAnchorPane().getChildren().add(continueGame);
+      //  playSubscene.getAnchorPane().getChildren().add(continueGame);
         addMenuButton(playButton);
 
         playButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -244,35 +245,16 @@ public class ViewManager {
 
 
                 showAndHideSubscenes(astroChooserScene);
-//                Stage primaryStage = new Stage();
-//                //Group root = new Group();
-//                Parent root = null;
-//                try {
-//                    root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../chooseAstronauts.fxml")));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                Scene chooseAstronauts = new Scene(root, Color.BLACK);
-//
-//                primaryStage.setTitle("Choose your Astronaut");
-//                primaryStage.setResizable(false);
-//                primaryStage.setScene(chooseAstronauts);
-//                primaryStage.setWidth(WIDTH);
-//                primaryStage.setHeight(HEIGHT);
-//
-//                primaryStage.show();
-//                MenuMain.gameMediaPlayer.stop();
+
             }
         });
-
-
     }
 
     private void createScoreButton(){
         StrandedButton scoreButton = new StrandedButton("SCORE");
         addMenuButton(scoreButton);
         InfoLabel scoreLabel = new InfoLabel("Game Help");
-        InfoLabel score = new InfoLabel("1. Name: Jerad: Health-80\n2. Name: Jerad: Health-79\n3.0 Name: Jerad: Health-78\n4.0 Name: Jerad: Health-30\n");
+        InfoLabel score = new InfoLabel("1. Name: Jerad: Health-80\n\n2. Name: Damien: Health-79\n3.0 Name: Dan: Health-78\n4.0 Name: Jun: Health-30\n");
         scoreLabel.setUnderline(true);
         scoreLabel.setLayoutY(-160);
         scoreLabel.setTextForTitle();

@@ -43,7 +43,7 @@ public class UserInput {
 
     public String[] action() throws IOException {
         /*Takes user input and it processes what type of action you are trying to take */
-        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        byte[] mapData = Files.readAllBytes(Paths.get("src/resources/synonyms.json"));
         Map<String,ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
 
         ObjectMapper objectMapper = new ObjectMapper();

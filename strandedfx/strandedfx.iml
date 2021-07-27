@@ -6,6 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/sample/models/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/sample/views/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/sample/models/resources/backs" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/sample/models/resources/maps" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/sample/volume/soundfx" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
