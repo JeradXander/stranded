@@ -86,7 +86,7 @@ public class Main {
                     }
 
 
-                    status.display();
+                   // status.display();
 //                    String[] action = UserInput.action();// ==> [go,west]
                     //send action to a class to update location/inventory/status etc.
 //                    status.action(action);
@@ -156,7 +156,7 @@ public class Main {
                     }
 
 
-                    status.display();
+                   // status.display();
 //                    String[] action = UserInput.action();// ==> [go,west]
                     //send action to a class to update location/inventory/status etc.
 //                    status.action(action);

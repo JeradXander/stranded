@@ -25,7 +25,7 @@ public class Alien {
     private String type;
     private String location;
     private boolean isAlive = true;
-    Player player = new Player("david", "Medic");
+    Player player ;
 
     //Constants
     private final int MIN_HP = 0;
@@ -36,7 +36,8 @@ public class Alien {
         super();
     }
     //Alien Constructor
-    public Alien(int HP, int attackDamage, int defense, String type, String location, boolean alive) {
+    public Alien(int HP, int attackDamage, int defense, String type, String location, boolean alive, Player _player) {
+        player = _player;
         setHp(HP);
         setAttackDamage(attackDamage);
         setDefense(defense);
@@ -85,22 +86,14 @@ public class Alien {
         return damage;
     }
 
-    public void takeDamage(int AttackStr) throws IOException {
-        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
-        Map<String, ArrayList<String>> synonymMap = new HashMap<String, ArrayList<String>>();
+    public void takeDamage(int AttackStr) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        synonymMap = objectMapper.readValue(mapData, HashMap.class);
-        String[] synArray = synonymMap.get("combat").toArray(new String[0]);
-        int synonymLength = synArray.length;
-        Random synRand = new Random();
-        int synSelector = synRand.nextInt(synonymLength);
 
         int totalDamage = AttackStr/defense;
         if (totalDamage == 0) { //Give at least 1 damage per turn with fists...
             totalDamage += 1;
         }
-        Combat.setResult(getType()+" took " + totalDamage + " damage! " + synArray[synSelector] + " attack!");
+
         setHp(-totalDamage);
     }
 

@@ -1,8 +1,11 @@
 package sample.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.game.conditions.Combat;
 import com.game.conditions.Travel;
 import com.game.conditions.Win;
+import com.game.enemies.Alien;
+import com.game.items.Item;
 import com.game.player.Player;
 
 import com.game.textparser.UserInput;
@@ -11,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import com.game.startmenu.Status;
@@ -94,6 +98,7 @@ public class GameViewManager {
     private Label displayName;
     private Label lastCommand;
     private Label displayPlayerHealth;
+    private Label combatText;
 
 //    User input variables
     private String moveDirection = "nowhere";
@@ -102,6 +107,7 @@ public class GameViewManager {
     private String locationToSearch = "here";
     private String itemDropped = "none";
     private Player playerCreated;
+    private Alien alienSoldier;
     private Status status;
 
 // Constructor
@@ -237,11 +243,27 @@ public class GameViewManager {
         System.out.println(input);
         input.toLowerCase();
         String [] actionArray = action(input);
+
         System.out.println(playerCreated.getName() + playerCreated.getAstronautClass());
+
         status.action(actionArray, playerCreated,this);
 
         HashMap<String,String> fxStatus = status.fxDisplayLocation();
 
+        if (fxStatus.get("Location").contains("Alien Compound")){
+            if(alienSoldier != null && alienSoldier.isAlive()){
+                startCombat(alienSoldier);
+                System.out.println("in combat");
+                setMapImage(fxStatus.get("Location"));
+            }else{
+                alienSoldier = createAlien();
+                startCombat(alienSoldier);
+                System.out.println("in combat");
+                setMapImage(fxStatus.get("Location"));
+            }
+        }else{
+            combatText.setText("");
+        }
         locationText.setText(fxStatus.get("Location"));
 
         setMapImage(fxStatus.get("Location"));
@@ -249,7 +271,12 @@ public class GameViewManager {
         descriptionText.setText(fxStatus.get("Description") + "\nItems you see: "+ fxStatus.get("Items"));
         //locationText.setText(fxStatus.get("Location"));
 
+        //display new health
+        displayPlayerHealth.setText(String.valueOf(playerCreated.getHP())+ "/100");
+        displayInventory.setText("Inventory:  " + playerCreated.viewInventory());
 
+
+        //check for take ooff
         if(playerCreated.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
 
             MenuMain.launchMediaPlayer.play();
@@ -260,18 +287,18 @@ public class GameViewManager {
                                     "Fixing spacecraft...\n" +
                                     "Take OFF\n" +
                                     "Landed");
-
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(7), new EventHandler<ActionEvent>() {
-
-
                 @Override
                 public void handle(ActionEvent event) {
 
 
                     GameWorld.setCurrentLocation("Landing Site");
+                    Location tempLocation = GameWorld.getPlanet1().get("Landing Site");
                     setMapImage(GameWorld.getCurrentLocation());
                     locationText.setText(GameWorld.getCurrentLocation());
-
+                    descriptionText.setText("Description " + tempLocation.getDescription() + "\n"+ fxStatus.get("Items"));
+                    playerCreated.setHP(100);
+                    displayPlayerHealth.setText(String.valueOf(playerCreated.getHP())+ "/100");
                 }
             }));
             timeline.play();
@@ -280,21 +307,56 @@ public class GameViewManager {
 
         if(playerCreated.getHP() == 0){
            // Lose.youLose();
-            if(UserInput.playAgain() == true){
 
-                playerCreated.clearInventory();
-                GameWorld.setCurrentLocation("Crash Site");
-                status = new Status();
-                playerCreated = null;
+            descriptionText.setFont(Font.font("Verdana", 30));
+            descriptionText.setText( "PITIFUL, YOUR WILL TO LIVE IS\n\n DEAD NOW, YOU ARE\n\n" +
+                                     "OVER GAME IS ");
 
-            } else {
+            displayName.setText("");
+            displayPlayerHealth.setText("");
+            locationText.setText("");
+            displayInventory.setText("");
+            lastCommand.setText("");
+            combatText.setText("");
 
-            }
+
+            GameWorld.setCurrentLocation("Crash Site");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+
+                  mainStage.close();
+                }
+            }));
+            timeline.play();
 
         }
 
         if (playerCreated.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
-            Win.youWin();
+            // Lose.youLose();
+
+            descriptionText.setFont(Font.font("Verdana", 30));
+            descriptionText.setText( "AMAZING, YOU ARE\n\n DEAD NOW, YOU ARE NOT\n\n" +
+                                     "GAME IS WON ");
+
+            displayName.setText("");
+            displayPlayerHealth.setText("");
+            locationText.setText("");
+            displayInventory.setText("");
+            lastCommand.setText("");
+            combatText.setText("");
+
+
+            GameWorld.setCurrentLocation("Crash Site");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+
+                    Platform.exit();
+                    System.exit(0);
+                }
+            }));
+            timeline.play();
         }
     }
 
@@ -520,7 +582,7 @@ public class GameViewManager {
 
     public String[] action(String playerControlString) throws IOException {
         /*Takes user input and it processes what type of action you are trying to take */
-        byte[] mapData = Files.readAllBytes(Paths.get("resources/synonyms.json"));
+        byte[] mapData = Files.readAllBytes(Paths.get("src/resources/synonyms.json"));
         Map<String,ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -603,9 +665,7 @@ public class GameViewManager {
         createExitButton();
     }
 
-//    credit button main menu
-
-
+    //exit button
     private void createExitButton(){
         StrandedButton exitButton = new StrandedButton("EXIT");
         mainPane.getChildren().add(exitButton);
@@ -621,7 +681,8 @@ public class GameViewManager {
             }
         });
     }
-// Crashsite
+
+    //method for backgorund
     private void createBackGround(){
         Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
         background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -683,13 +744,6 @@ public class GameViewManager {
         help.setLayoutX(10);
         help.setLayoutY(5);
 
-
-
-
-
-
-
-
         //gameHelpSubscene = new SmallHelpSubScene();
         helpButton.setLayoutX(475);
         helpButton.setLayoutY(725);
@@ -709,6 +763,7 @@ public class GameViewManager {
                 }
             }
         });
+
         helpButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -720,20 +775,12 @@ public class GameViewManager {
     }
 
 
-
     private void createTextScene() throws IOException, InterruptedException {
         displayTextSubScene = new GameStrandedSubScene();
 
             //This is to display all the game text
-            locationText = new Label("Participate in the activities associated with the design, development, and support for \n" +
-                                     "PeopleSoft implementation or upgrade projects. Provide engagement delivery services both \n" +
-                                     "as an individual and as a team member. Services include identifying needs, developing, \n" +
-                                     "influencing, and implementing proposals. Able to lead, support, and participate in project \n" +
-                                     "teams to ensure system and business requirements are clearly documented and understood. \n" +
-                                     "This position requires the ability to manage multiple tasks and link those tasks to business \n" +
-                                     "initiatives. Familiarity with all aspects of the software development life cycle and expertise in \n" +
-                                     "utilizing software implementation methodology based on industry best practices. Must be \n" +
-                                     "willing to travel (if required by customer)");
+            locationText = new Label("Participate i");
+
             locationText.setLayoutX(25);
             locationText.setLayoutY(25);
             displayTextSubScene.getAnchorPane().getChildren().add(locationText);
@@ -745,6 +792,13 @@ public class GameViewManager {
             descriptionText.setLayoutX(25);
             descriptionText.setLayoutY(50);
             displayTextSubScene.getAnchorPane().getChildren().add(descriptionText);
+
+        combatText = new Label("");
+        combatText.setMaxWidth(350);
+        combatText.setWrapText(true);
+        combatText.setLayoutX(25);
+        combatText.setLayoutY(100);
+        displayTextSubScene.getAnchorPane().getChildren().add(combatText);
 
         //inventory
         displayInventory = new Label("Inventory:  " + playerCreated.viewInventory());
@@ -785,7 +839,7 @@ public class GameViewManager {
     }
 
 
-    //  User Input Section
+    // User Input Section
     public String move(String[] inputStringArrayArg){
         String directionString = inputStringArrayArg[1].toUpperCase();
         if(!directionString.equals("NORTH") && !directionString.equals("SOUTH") && !directionString.equals("EAST") && !directionString.equals("WEST")){
@@ -799,7 +853,6 @@ public class GameViewManager {
         }
         return moveDirection;
     }
-
 
     public String grabItem(String[] inputStringArrayArg){
         itemGrabbed = inputStringArrayArg[1];
@@ -816,7 +869,6 @@ public class GameViewManager {
         }
 
         return useItemGrabbed;
-
     }
 
     //needs validation?
@@ -835,35 +887,119 @@ public class GameViewManager {
         return itemDropped;
     }
 
-//    public boolean playAgain(){
-//        boolean askForReplay = true;
-//        int userNum = 0;
-//        while (askForReplay){
-//            System.out.println("Would you like to play Stranded again?");
-//            System.out.println("Please enter the number for your choice");
-//            System.out.println("1) Yes\n2) No");
+    //Combat methods
+    private Alien createAlien() throws IOException {
+        //Return alien from JSON file.
+        //byte[] alienData = Files.readAllBytes(Paths.get("src/main/resources/enemies.json"));
+        byte[] alienData = Files.readAllBytes(Paths.get("resources/enemies.json"));
+        ObjectMapper objectMapper = new ObjectMapper();
+        Alien[] alien = objectMapper.readValue(alienData, Alien[].class);
+
+        Alien myAlien = null;
+
+        //Returns the alien based on the "location" field in the enemies.json  Has to match current player location.
+        for (Alien enemy:alien) {
+            if (enemy.getLocation().equals(GameWorld.getCurrentLocation())) {
+                myAlien = enemy;
+                break;
+            }
+        }
+        return myAlien;
+    }
+
+    private void startCombat(Alien soldier) throws InterruptedException, IOException {
+        if (soldier != null ) {
+
+            if(soldier.isAlive() && (playerCreated.getHP() > playerCreated.getMinHp())) {
+                //Verify action
+
+                    fightStatus(soldier);
 //
-//            try {
-////                String userString = input.nextLine();
-//                userNum = Integer.parseInt(userString);
+            }
+        }
+    }
+
+
+    private void fightStatus(Alien soldier) throws InterruptedException, IOException {
+
+        String inventoryString =  playerCreated.viewInventory().toString();
+        if(inventoryString.isEmpty()){
+
+            String assClass = playerCreated.getAstronautClass().toLowerCase();
+            if(assClass.equals("soldier")){
+                soldier.takeDamage(20);
+                playerCreated.takeDamage(10);
+            }else {
+                soldier.takeDamage(10);
+                playerCreated.takeDamage(10);
+            }
+            String hp = String.valueOf(playerCreated.getHP());
+            String maxHp = String.valueOf(playerCreated.getMaxHp());
+            String alienhp = String.valueOf(soldier.getHp());
+            displayPlayerHealth.setText(hp + "/" + maxHp);
+            combatText.setText("**********ALERT, ALIEN IS ATTACKING YOU*************\n" +
+                               "============================================\n" +
+                               "Enemy:" + soldier.getType() + " HP: "+alienhp + "\n" +
+                               "============================================" +
+                               "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
+                               "You attacked with your fists. You should probably go somewhere else\n" +
+                               "------------------------------------------------");
+
+            if(soldier.getHp() < 0) {
+
+                alienSoldier.setAlive(false);
+                combatText.setText("**********ALERT, ALIEN IS ATTACKING YOU*************\n" +
+                                   "============================================\n" +
+                                   "Enemy:" + soldier.getType() + " HP: "+alienhp + "\n" +
+                                   "============================================" +
+                                   "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
+                                   "You attacked with your fists. " +
+                                   "" +
+                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are till alive" +
+                                   "\n" +
+                                   "------------------------------------------------");
+            }
+
+
+        }else {
+
+            String assClass = playerCreated.getAstronautClass().toLowerCase();
+            if(assClass.equals("soldier")){
+                soldier.takeDamage(25);
+                playerCreated.takeDamage(5);
+            }else {
+                soldier.takeDamage(15);
+                playerCreated.takeDamage(10);
+            }
+
+            String hp = String.valueOf(playerCreated.getHP());
+            String maxHp = String.valueOf(playerCreated.getMaxHp());
+            String alienhp = String.valueOf(soldier.getHp());
+            displayPlayerHealth.setText(hp + "/" + maxHp);
+            combatText.setText("**********ALERT, ALIEN IS ATTACKING YOU*************\n" +
+                               "============================================\n" +
+                               "Enemy:" + soldier.getType() + " HP: "+alienhp + "\n" +
+                               "============================================" +
+                               "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
+                               "You attacked with the first weapon in your inventory. You should probably go somewhere else though\n" +
+                               "------------------------------------------------");
+
+            if(soldier.getHp() < 0) {
+
+                alienSoldier.setAlive(false);
+                combatText.setText("**********ALERT, ALIEN IS ATTACKING YOU*************\n" +
+                                   "============================================\n" +
+                                   "Enemy:" + soldier.getType() + " HP: "+alienhp + "\n" +
+                                   "============================================" +
+                                   "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
+                                   "You attacked with the first weapon in your inventory. " +
+                                   "" +
+                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are till alive" +
+                                   "\n" +
+                                   "------------------------------------------------");
+            }
+        }
 //
-//                if(userNum > 0 && userNum < 3){
-//                    askForReplay = false;
-//                    break;
-//                } else {
-//                    System.out.println("Invalid Choice");
-//                    System.out.println("====================");
-//                }
-//
-//            } catch (Exception e){
-//                System.out.println("Invalid Choice");
-//                System.out.println("====================");
-//            }
-//        }
-//
-//        return userNum == 1;
-//
-//
-//    }
+    }
 
 }
