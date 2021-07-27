@@ -302,7 +302,7 @@ public class GameViewManager {
            // Lose.youLose();
 
             descriptionText.setFont(Font.font("Verdana", 30));
-            descriptionText.setText( "PITIFUL, YOUR WILL TO LIVE IS\n\n DEAD NOW, YOU ARE\n\n" +
+            descriptionText.setText( "PITIFUL, YOUR WILL TO LIVE IS\n\nDEAD NOW, YOU ARE\n\n" +
                                      "OVER GAME IS ");
 
             displayName.setText("");
@@ -329,7 +329,7 @@ public class GameViewManager {
             // Lose.youLose();
 
             descriptionText.setFont(Font.font("Verdana", 30));
-            descriptionText.setText( "AMAZING, YOU ARE\n\n DEAD NOW, YOU ARE NOT\n\n" +
+            descriptionText.setText( "AMAZING, YOU ARE\n\nDEAD NOW, YOU ARE NOT\n\n" +
                                      "GAME IS WON ");
 
             displayName.setText("");
@@ -358,7 +358,7 @@ public class GameViewManager {
         switch (location){
 
             case "Crash Site":
-                map.setImage(new Image("sample/models/resources/maps/crashSite.png"));
+                map.setImage(new Image("crashsitemap.png"));
                 background = new BackgroundImage(new Image("crashSite.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
                                                  BackgroundPosition.DEFAULT, null);
                 map.setFitWidth(250);
@@ -677,7 +677,7 @@ public class GameViewManager {
 
     //method for backgorund
     private void createBackGround(){
-        Image mainBackImage = new Image("crashSite.png", 1000, 800, false, true);
+        Image mainBackImage = new Image("crashSite.png", 1200, 880, false, true);
         background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
                                                          BackgroundPosition.DEFAULT,null);
 
@@ -687,7 +687,7 @@ public class GameViewManager {
 //    Map placeholder
     private void creatMapButton(){
         StrandedButton mapButton = new StrandedButton("MAP");
-        map = new ImageView("sample/models/resources/maps/crashSite.png");
+        map = new ImageView("crashsitemap.png");
         map.setFitWidth(250);
         map.setPreserveRatio(true);
         map.setLayoutX(25);
