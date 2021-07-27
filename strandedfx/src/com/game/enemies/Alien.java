@@ -2,8 +2,16 @@ package com.game.enemies;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.conditions.Combat;
 import com.game.player.Player;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -17,6 +25,7 @@ public class Alien {
     private String type;
     private String location;
     private boolean isAlive = true;
+    Player player ;
 
     //Constants
     private final int MIN_HP = 0;
@@ -27,7 +36,8 @@ public class Alien {
         super();
     }
     //Alien Constructor
-    public Alien(int HP, int attackDamage, int defense, String type, String location, boolean alive) {
+    public Alien(int HP, int attackDamage, int defense, String type, String location, boolean alive, Player _player) {
+        player = _player;
         setHp(HP);
         setAttackDamage(attackDamage);
         setDefense(defense);
@@ -51,10 +61,10 @@ public class Alien {
         int randAttack = rand.nextInt(chance);
 
         if (randAttack == chance-1) {
-            Player.takeDamage(superAttack());
+            player.takeDamage(superAttack());
         }
         else {
-            Player.takeDamage(normalAttack());
+            player.takeDamage(normalAttack());
         }
     }
 
@@ -77,11 +87,13 @@ public class Alien {
     }
 
     public void takeDamage(int AttackStr) {
+
+
         int totalDamage = AttackStr/defense;
         if (totalDamage == 0) { //Give at least 1 damage per turn with fists...
             totalDamage += 1;
         }
-        Combat.setResult(getType()+" took " + totalDamage + " damage!");
+
         setHp(-totalDamage);
     }
 

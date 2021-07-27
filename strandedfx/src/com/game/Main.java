@@ -2,6 +2,7 @@ package com.game;
 
 import com.game.conditions.Travel;
 import com.game.conditions.Win;
+import com.game.items.Item;
 import com.game.player.Player;
 import com.game.startmenu.StartMenu;
 import com.game.startmenu.Status;
@@ -10,10 +11,13 @@ import com.game.world.Location;
 import com.game.conditions.Lose;
 import com.game.textparser.UserInput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class Main {
+    Player player = new Player("david", "Medic");
+
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean isRunning = true;
         StartMenu start = new StartMenu();
@@ -29,7 +33,17 @@ public class Main {
             while (player == null) {
                 GameWorld ourGame = new GameWorld();
                 HashMap<String, Location> planet1 = ourGame.getPlanet1();
-                player = new Player("dan", "explorer");
+                player = new Player("dan", "Soldier");
+                if (player.getAstronautClass().equals("Medic")){
+                    //Player.addItem(Item med-pack);
+                    Location medpacks = planet1.get("Starting Items");
+                    player.move("Starting Items");
+                    //status.action(new String[] {"grab", "med-pack"});
+
+                    System.out.println("As the medic you start out with five med-packs!");
+                    player.move("Crash Site");
+                    player.setHP(100);
+                }
                 Run = true;
 
             }
@@ -40,17 +54,17 @@ public class Main {
 
                     if (GameWorld.getCurrentLocation() != null){
 
-                        if(Player.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
+                        if(player.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
                             Travel.goToAnotherPlanet();
                             Travel.lowFuelWarning();
                             GameWorld.setCurrentLocation("Landing Site");
                         }
 
-                        if(Player.getHP() == 0){
+                        if(player.getHP() == 0){
                             Lose.youLose();
                             if(UserInput.playAgain() == true){
                                 Run = false;
-                                Player.clearInventory();
+                                player.clearInventory();
                                 GameWorld.setCurrentLocation("Crash Site");
                                 status = new Status();
                                 player = null;
@@ -63,7 +77,7 @@ public class Main {
 
                         }
 
-                        if (Player.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
+                        if (player.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
                             Win.youWin();
                             Run = false;
                             isRunning = false;
@@ -72,10 +86,10 @@ public class Main {
                     }
 
 
-                    status.display();
-                    String[] action = UserInput.action();// ==> [go,west]
+                   // status.display();
+//                    String[] action = UserInput.action();// ==> [go,west]
                     //send action to a class to update location/inventory/status etc.
-                    status.action(action);
+//                    status.action(action);
                     move = true;
                 }
 
@@ -110,17 +124,17 @@ public class Main {
 
                     if (GameWorld.getCurrentLocation() != null){
 
-                        if(Player.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
+                        if(player.keyItemCheck() == 2 && GameWorld.getCurrentLocation().equals("Crash Site")){
                             Travel.goToAnotherPlanet();
                             Travel.lowFuelWarning();
                             GameWorld.setCurrentLocation("Landing Site");
                         }
 
-                        if(Player.getHP() == 0){
+                        if(player.getHP() == 0){
                             Lose.youLose();
                             if(UserInput.playAgain() == true){
                                 Run = false;
-                                Player.clearInventory();
+                                player.clearInventory();
                                 GameWorld.setCurrentLocation("Crash Site");
                                 status = new Status();
                                 player = null;
@@ -133,7 +147,7 @@ public class Main {
 
                         }
 
-                        if (Player.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
+                        if (player.keyItemCheck() == 3 && GameWorld.getCurrentLocation().equals("Landing Site")) {
                             Win.youWin();
                             Run = false;
                             isRunning = false;
@@ -142,10 +156,10 @@ public class Main {
                     }
 
 
-                    status.display();
-                    String[] action = UserInput.action();// ==> [go,west]
+                   // status.display();
+//                    String[] action = UserInput.action();// ==> [go,west]
                     //send action to a class to update location/inventory/status etc.
-                    status.action(action);
+//                    status.action(action);
                     move = true;
                 }
 

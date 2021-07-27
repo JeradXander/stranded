@@ -18,7 +18,7 @@ import java.util.Objects;
 import javafx.event.ActionEvent;
 import com.game.Main;
 
-import static com.game.startmenu.Status.fxDisplayPlayer;
+//import static com.game.startmenu.Status.fxDisplayPlayer;
 import static com.game.world.GameWorld.currentLocation;
 
 
@@ -83,9 +83,9 @@ public class Controller {
     public void setSendCommand() throws IOException, InterruptedException {
         fxCurrentLocation.setText(currentLocation);
         System.out.println(planet1.get("description"));
-        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
-        fxDescription.setText(fxCurrLocation.get("Description"));
-        HashMap<String, Integer> fxPlayerHP = fxDisplayPlayer();
+//        HashMap<String, String> fxCurrLocation = Status.fxDisplayLocation();
+//        fxDescription.setText(fxCurrLocation.get("Description"));
+//        HashMap<String, Integer> fxPlayerHP = fxDisplayPlayer();
 
     }
     private void runningGame(Stage stage ,Player player, GameWorld gameWorld){

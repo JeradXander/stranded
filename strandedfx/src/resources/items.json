@@ -1,0 +1,131 @@
+﻿[
+	{
+		"id": 31,
+		"hpValue": 0,
+		"type": "tool",
+		"itemName": "shovel",
+		"location": "Frozen Tundra",
+		"description": "A shovel to dig your spacecraft out of the mess you made",
+		"keyItem": true
+	},
+	{
+		"id": 32,
+		"hpValue": 0,
+		"type": "tool",
+		"itemName": "toolset",
+		"location": "Crater",
+		"description": "How did your toolset fall out here? You need these to fix your craft.",
+		"keyItem": true
+	},
+	{
+		"id": 33,
+		"hpValue": 20,
+		"type": "food",
+		"itemName": "fruit",
+		"location": "Jungle",
+		"description": "Delicious exotic fruit",
+		"keyItem": false
+	},
+	{
+		"id": 34,
+		"hpValue": 15,
+		"type": "food",
+		"itemName": "fish",
+		"location": "Beach",
+		"description": "A flopping fish.  You're not a huge fan of sushi though..",
+		"keyItem": false
+
+	},
+	{
+		"id": 35,
+		"hpValue": 20,
+		"type": "food",
+		"itemName": "water",
+		"location": "Creek",
+		"description": "Looks like clear alien water.  No way it could hurt right?",
+		"keyItem": false
+	},
+	{
+		"id": 36,
+		"hpValue": 40,
+		"type": "food",
+		"itemName": "canned-food",
+		"location": "Lava Tubes",
+		"description": "Seem like you can spend a night or two here. ",
+		"keyItem": false
+	},
+	{
+		"id": 37,
+		"hpValue": 0,
+		"type": "tool",
+		"itemName": "empty-fuel-can",
+		"location": "Lava Tube",
+		"description": "Great! You can now have more backup fuel. ",
+		"keyItem": false
+	},
+	{
+		"id": 38,
+		"hpValue": 25,
+		"type": "food",
+		"itemName": "goop",
+		"location": "Alien Compound",
+		"description": "Some strange goop that aliens were eating.  Might be ok to try ",
+		"keyItem": false
+	},
+	{
+		"id": 39,
+		"hpValue": 60,
+		"type": "food",
+		"itemName": "food-pack",
+		"location": "Alien Compound 2",
+		"description": "Some strange goop that aliens were eating.  Might be ok to try ",
+		"keyItem": false
+	},
+	{
+		"id": 40,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 41,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 42,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 43,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	},
+	{
+		"id": 44,
+		"hpValue": 10,
+		"type": "food",
+		"itemName": "med-pack",
+		"location": "Starting Items",
+		"description": "Use in times of duress.",
+		"keyItem": false
+	}
+
+
+]

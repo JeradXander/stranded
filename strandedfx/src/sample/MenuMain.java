@@ -1,12 +1,8 @@
 package sample;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Objects;
 
-import com.game.Main;
 import javafx.application.Application;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 import sample.views.ViewManager;
 import javafx.scene.media.Media;
@@ -23,28 +19,49 @@ public class MenuMain extends Application {
         menuStage.setTitle("Stranded");
        // menuStage.setScene(new Scene(root, 300, 275, Color.GREENYELLOW));
         menuStage.show();
-//        Slider slider1 = new Slider(0, 100, 0)
-//        Media media = new Media("menu_song.mp3");
-
-//        File file = new File("menu_song.mp3");
-//        String path = file.getAbsolutePath();
-//        System.out.println(path);
-//        Media media = new Media(new File(path).toURI().toString());
-//        MediaPlayer mediaPlayer = new MediaPlayer(media);
-//        mediaPlayer.setAutoPlay(true);
 
     }
     public static MediaPlayer mediaPlayer;
+    public static MediaPlayer fxmediaPlayer;
+    public static MediaPlayer laserMediaPlayer;
+    public  static MediaPlayer clickMediaPlayer;
+    public  static MediaPlayer launchMediaPlayer;
     public void music() {
-       // String s = "src/sample/views/resources/intro.wav";
-       // String path = Paths.get(s).toUri().toString();
+        // String s = "src/sample/views/resources/intro.wav";
+        // String path = Paths.get(s).toUri().toString();
         String respath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("intro.wav")).toExternalForm();
         System.out.println(respath);
         Media h = new Media(respath);
         mediaPlayer = new MediaPlayer(h);
+        mediaPlayer.setVolume(5 * 0.01);
         mediaPlayer.play();
-    }
 
+
+        String fxpath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("explosion.mp3")).toExternalForm();
+        System.out.println(fxpath);
+        Media fx = new Media(fxpath);
+        fxmediaPlayer = new MediaPlayer(fx);
+        fxmediaPlayer.setVolume(5 * 0.01);
+
+        String laserPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("beep.mp3")).toExternalForm();
+        System.out.println(laserPath);
+        Media las = new Media(laserPath);
+        laserMediaPlayer = new MediaPlayer(las);
+        laserMediaPlayer.setVolume(5 * 0.01);
+
+        String clickPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("10.mp3")).toExternalForm();
+        System.out.println(clickPath);
+        Media clk = new Media(clickPath);
+        clickMediaPlayer = new MediaPlayer(clk);
+        clickMediaPlayer.setVolume(5 * 0.01);
+
+        String launchPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("launchSound.mp3")).toExternalForm();
+        Media lnc = new Media(launchPath);
+        launchMediaPlayer = new MediaPlayer(lnc);
+        launchMediaPlayer.setVolume(5 * 0.01);
+
+
+    }
 
 
 

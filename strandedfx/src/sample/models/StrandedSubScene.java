@@ -15,9 +15,14 @@ public class StrandedSubScene extends SubScene {
     private final String FONT_PATH = "src/sample/models/resources/kenvector_future.ttf";
     private final String BACKGROUND_IMAGE = "sample/models/resources/red_panel.png";
 
+    public boolean isHidden() {
+        return isHidden;
+    }
+
     private boolean isHidden =true;
 
     public StrandedSubScene() {
+
         super(new AnchorPane(), 600, 400);
         prefHeight(600);
         prefWidth(400);
@@ -59,6 +64,38 @@ public class StrandedSubScene extends SubScene {
             isHidden = true;
         }
 
+    }
+
+    public void setSmallSubScene(double width, double height){
+//        this.prefHeight(height);
+//        this.prefWidth(width);
+        prefHeight(height);
+        prefWidth(width);
+
+    }
+
+    public void hideSubScene(){
+        TranslateTransition transition = new TranslateTransition();
+
+        transition.setDuration(Duration.seconds(0.4));
+        transition.setNode(this);
+
+        transition.setToX(725);
+
+        transition.play();
+        isHidden = true;
+    }
+
+    public void showSubScene(){
+        TranslateTransition transition = new TranslateTransition();
+
+        transition.setDuration(Duration.seconds(0.4));
+        transition.setNode(this);
+
+        transition.setToX(-725);
+
+        transition.play();
+        isHidden = false;
     }
 
     public AnchorPane getAnchorPane(){

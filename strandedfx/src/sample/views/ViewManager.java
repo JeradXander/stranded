@@ -1,8 +1,9 @@
 package sample.views;
 
+import com.game.player.Player;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -10,9 +11,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -20,8 +21,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import sample.MenuMain;
+import sample.models.ASTRO;
+import sample.models.AstroPicker;
 import sample.models.InfoLabel;
 import sample.models.StrandedButton;
 import sample.models.StrandedSubScene;
@@ -36,11 +41,14 @@ public class ViewManager {
     private StrandedSubScene sceneThatNeedsToSlide;
 
     private ArrayList<StrandedButton> buttonList;
+    private ArrayList<AstroPicker> astroList;
+    private ASTRO chosenAstro;
 
     private StrandedSubScene creditSubscene;
     private StrandedSubScene helpSubscene;
     private StrandedSubScene scoreSubscene;
     private StrandedSubScene playSubscene;
+    private StrandedSubScene astroChooserScene;
 
 
 
@@ -73,6 +81,9 @@ public class ViewManager {
 
         createSlider();
 
+        createchooseSubscene();
+
+
         StrandedSubScene subscene = new StrandedSubScene();
         mainPane.getChildren().add(subscene);
     }
@@ -95,8 +106,13 @@ public class ViewManager {
         scoreSubscene = new StrandedSubScene();
         mainPane.getChildren().add(scoreSubscene);
 
-    }
+        astroChooserScene = new StrandedSubScene();
+        mainPane.getChildren().add(astroChooserScene);
 
+
+
+    }
+// Volume slider
     private void createSlider(){
         Slider volumeControl = new Slider(0, 100, 5);
 
@@ -109,6 +125,68 @@ public class ViewManager {
                 System.out.println("volume" + volumeControl.getValue());
             }
         });
+    }
+
+//    Create subscene
+    private void createchooseSubscene(){
+        astroChooserScene = new StrandedSubScene();
+        InfoLabel astroLabel = new InfoLabel("CHOOSE ASTRO:\nLEFT: SOLDIER MIDDLE: MEDIC RIGHT: EXPLORER");
+        astroLabel.setAlignment(Pos.CENTER);
+
+        mainPane.getChildren().add(astroChooserScene);
+        StrandedButton startButton = new StrandedButton("START");
+        startButton.setLayoutY(150);
+        startButton.setLayoutX(210);
+        astroLabel.setLayoutY(-100);
+        astroChooserScene.getAnchorPane().getChildren().add(astroToChoose());
+        astroChooserScene.getAnchorPane().getChildren().add(astroLabel);
+      astroChooserScene.getAnchorPane().getChildren().add(startButton);
+
+        startButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                System.out.println("clicked");
+                MenuMain.mediaPlayer.stop();
+                GameViewManager manager = null;
+                String type = chosenAstro.name();
+                try {
+                    manager = new GameViewManager(new Player("Matt Damon",type));
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mainStage = manager.getMainStage();
+                // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
+//                mainStage.setTitle("GameView");
+
+                mainStage.show();
+            }
+        });
+    }
+
+//    Choose astronaut
+    private HBox astroToChoose(){
+
+        HBox box = new HBox();
+        box.setSpacing(40);
+        astroList = new ArrayList<>();
+        for(ASTRO astro: ASTRO.values()){
+            System.out.println(astro);
+            AstroPicker astroToPick = new AstroPicker(astro);
+            astroList.add(astroToPick);
+            box.getChildren().add(astroToPick);
+            chosenAstro = astroToPick.getAstro();
+
+            astroToPick.setOnMouseClicked(mouseEvent -> {
+                for(AstroPicker astros : astroList){
+                    astros.setIsBoxChecked(false);
+                }
+                astroToPick.setIsBoxChecked(true);
+                chosenAstro = astroToPick.getAstro();
+            });
+        }
+        box.setLayoutX(400 - (110*2));
+        box.setLayoutY(275);
+        return box;
     }
 
 
@@ -150,10 +228,8 @@ public class ViewManager {
         continueGame.setLayoutY(225);
         continueGame.setButtonFontForLongText();
 
-
-
         playSubscene.getAnchorPane().getChildren().add(newGameButton);
-        playSubscene.getAnchorPane().getChildren().add(continueGame);
+      //  playSubscene.getAnchorPane().getChildren().add(continueGame);
         addMenuButton(playButton);
 
         playButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -167,35 +243,18 @@ public class ViewManager {
             @Override
             public void handle(MouseEvent mouseEvent) {
 
-                Stage primaryStage = new Stage();
-                //Group root = new Group();
-                Parent root = null;
-                try {
-                    root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../chooseAstronauts.fxml")));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Scene chooseAstronauts = new Scene(root, Color.BLACK);
 
-                primaryStage.setTitle("Choose your Astronaut");
-                primaryStage.setResizable(false);
-                primaryStage.setScene(chooseAstronauts);
-                primaryStage.setWidth(WIDTH);
-                primaryStage.setHeight(HEIGHT);
+                showAndHideSubscenes(astroChooserScene);
 
-                primaryStage.show();
-                MenuMain.mediaPlayer.stop();
             }
         });
-
-
     }
 
     private void createScoreButton(){
         StrandedButton scoreButton = new StrandedButton("SCORE");
         addMenuButton(scoreButton);
         InfoLabel scoreLabel = new InfoLabel("Game Help");
-        InfoLabel score = new InfoLabel("1. Name: Jerad: Health-80\n2. Name: Jerad: Health-79\n3.0 Name: Jerad: Health-78\n4.0 Name: Jerad: Health-30\n");
+        InfoLabel score = new InfoLabel("1. Name: Jerad: Health-80\n\n2. Name: Damien: Health-79\n3.0 Name: Dan: Health-78\n4.0 Name: Jun: Health-30\n");
         scoreLabel.setUnderline(true);
         scoreLabel.setLayoutY(-160);
         scoreLabel.setTextForTitle();
@@ -215,10 +274,13 @@ public class ViewManager {
     }
 
     private void createHelpButton(){
-
+//        Font font = new Font(120);
         StrandedButton helpButton = new StrandedButton("HELP");
         InfoLabel helpLabel = new InfoLabel("Game Help");
-        InfoLabel help = new InfoLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
+        InfoLabel help = new InfoLabel("Type Commands to Play the Game. \n\nMove: Go + Direction 'North, East, South, West'\n\n" +
+        "Grab Item: Grab + Item/Weapon/Food \n\nInspect Surroundings: Search + here/area name \n\nDrop Item: Drop + item \n\n" +
+        "Use Item: Use/Eat + Item/Weapon/Food \n\nPress the Map button to check the Map. If you don't remember the commands use similar words");
+        help.setFont(Font.font("Verdana", 16));
         helpLabel.setUnderline(true);
         helpLabel.setLayoutY(-160);
         helpLabel.setTextForTitle();
@@ -304,7 +366,6 @@ public class ViewManager {
                 logo.setEffect(null);
             }
         });
-
         mainPane.getChildren().add(logo);
     }
 

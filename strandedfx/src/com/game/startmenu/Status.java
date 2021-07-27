@@ -8,12 +8,17 @@ import com.game.world.Location;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import sample.views.GameViewManager;
 
 public class Status {
 
     private String action = "None";
     private String noun = "";
     private String result = "";
+
+    Player player;
+
+    GameViewManager gameViewManager;
 
     // Constructor
     public Status() {
@@ -22,16 +27,19 @@ public class Status {
 
     //Methods for actions
 
-    public void action(String[] command) throws IllegalArgumentException{
+public void action(String[] command, Player _player, GameViewManager _gameViewManager) throws IllegalArgumentException{
     //command[0] is action, command[1] is direction/item/etc.
 
+    player = _player;
+
+    System.out.println(player.getName()+player.getAstronautClass());
         //Initialize variables for action logic
         String currentLoc = GameWorld.getCurrentLocation();
         HashMap<String, ArrayList<Item>> inventoryMap = GameWorld.getGameItems();
         ArrayList<Item> inventoryArray = inventoryMap.get(currentLoc);
         HashMap<String, ArrayList<Item>> hiddenItemsMap = GameWorld.getHiddenItems();
         ArrayList<Item> hiddenItemsArray = hiddenItemsMap.get(currentLoc);
-        ArrayList<Item> playerItems = Player.getInventory();
+        ArrayList<Item> playerItems = _player.getInventory();
 
         if (currentLoc == null || currentLoc.equals("")) {
             currentLoc = GameWorld.getPreviousLocation();
@@ -47,7 +55,7 @@ public class Status {
 
             // new method for moving player
             if (!nextLoc.equals(currentLoc)) { //This will prevent move method being called, so HP won't be penalized.
-                Player.move(nextLoc);
+                _player.move(nextLoc);
             }
             //setResult("Moving is tiring and HP draining on this planet..");
         }
@@ -59,7 +67,7 @@ public class Status {
             Item removeItem = null;
             for(Item item: inventoryArray){
                 if(item.getItemName().equals(command[1])){
-                    Player.addItem(item);
+                    _player.addItem(item);
                     removeItem = item;
                     setResult(item.getItemName() + " grabbed! " + item.getDescription());
                 } else {
@@ -126,7 +134,7 @@ public class Status {
 
                 if (usedItem.getType().equals("food")) {
 
-                    Player.eat(usedItem);
+                    _player.eat(usedItem);
 
                     setResult(command[1] + " used!");
                 }
@@ -144,19 +152,27 @@ public class Status {
         setAction(command[0]);
         setNoun(command[1]);
     }
-
-    public void display() throws InterruptedException, IOException {
-        clearConsole();
-        String currentLoc = GameWorld.getCurrentLocation();
-        if (currentLoc == null || currentLoc.equals("")) {
-            currentLoc = GameWorld.getPreviousLocation();
-        }
-        Combat combat = null;
-        if (currentLoc.contains("Alien Compound")) {
-            combat = new Combat();
-        }
-        Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
-
+//
+//    public void display() throws InterruptedException, IOException {
+//        clearConsole();
+//        String currentLoc = GameWorld.getCurrentLocation();
+//        if (currentLoc == null || currentLoc.equals("")) {
+//            currentLoc = GameWorld.getPreviousLocation();
+//        }
+//        Combat combat = null;
+//        if (currentLoc.contains("Alien Compound")) {
+////            combat = new Combat();
+//        }
+//        Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
+//
+////        gameViewManager.locationText.setText(currentLocData.getName());
+////
+////        gameViewManager.descriptionText.setText("===================================================\n" +
+////                                                "Description: \" +  currentLocData.getDescription()\n" +
+////                                                "Items you see: " + GameWorld.getItemsByLocation(currentLoc)+
+////                                                "===================================================\n" +
+////                                                "" );
+//
 //        System.out.println("===================================================");
 //        System.out.println("Location: " + currentLocData.getName());
 //        System.out.println("===================================================");
@@ -164,17 +180,18 @@ public class Status {
 //        System.out.println("\n");
 //        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
 //        System.out.println("===================================================");
-//        System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
-//        System.out.println("Current Inventory: " + Player.viewInventory());
+//        System.out.println("Name: " + "dan" + " | HP: " + player.getHP() + " / " + player.getMaxHp());
+//        //Player.getName()
+//        System.out.println("Current Inventory: " + player.viewInventory());
 //        System.out.println("---------------------------------------------------");
 //        System.out.println("Last action taken: " + getAction() + " "+ getNoun());
 //        System.out.println(getResult()); //Display action results
 //        setResult(""); //Reset action results for next action
-
-    }
+//
+//    }
 
     //method to send info to javafx
-    public static HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
+    public HashMap<String, String> fxDisplayLocation() throws InterruptedException, IOException {
         HashMap<String, String> fxLocationHMap = new HashMap<>();
         String currentLoc = GameWorld.getCurrentLocation();
         if (currentLoc == null || currentLoc.equals("")) {
@@ -182,17 +199,10 @@ public class Status {
         }
         Combat combat = null;
         if (currentLoc.contains("Alien Compound")) {
-            combat = new Combat();
+        //    combat = new Combat();
         }
         Location currentLocData = GameWorld.getPlanet1().get(currentLoc);
 
-        System.out.println("===================================================");
-        System.out.println("Location: " + currentLocData.getName());
-        System.out.println("===================================================");
-        System.out.println("Description: " +  currentLocData.getDescription());
-        System.out.println("\n");
-        System.out.println("Items you see: " + GameWorld.getItemsByLocation(currentLoc));
-        System.out.println("===================================================");
         fxLocationHMap.put("Location", currentLocData.getName());
         fxLocationHMap.put("Description", currentLocData.getDescription());
         fxLocationHMap.put("Items", GameWorld.getItemsByLocation(currentLoc).toString());
@@ -203,15 +213,15 @@ public class Status {
 
     }
 
-    public static HashMap<String, Integer> fxDisplayPlayer() throws InterruptedException, IOException {
-        HashMap<String, Integer> fxPlayerHMap = new HashMap<>();
-        //System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
-        fxPlayerHMap.put("HP", Player.getHP());
-        fxPlayerHMap.put("MaxHP", Player.getMaxHp());
-
-        return fxPlayerHMap;
-
-    }
+//    public static HashMap<String, Integer> fxDisplayPlayer() throws InterruptedException, IOException {
+//        HashMap<String, Integer> fxPlayerHMap = new HashMap<>();
+//        //System.out.println("Name: " + Player.getName() + " | HP: " + Player.getHP() + " / " + Player.getMaxHp());
+//        fxPlayerHMap.put("HP", player.getHP());
+//        fxPlayerHMap.put("MaxHP", Player.getMaxHp());
+//
+//        return fxPlayerHMap;
+//
+//    }
 
     public static void clearConsole() throws InterruptedException {
         /* Code Attributed to DelftStack
