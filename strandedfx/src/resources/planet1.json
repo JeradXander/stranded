@@ -130,7 +130,7 @@
 		"name": "Alien Compound 2",
 		"description": "The smell...the horrible smell",
 		"north": null,
-		"east": "Landing site",
+		"east": "Landing Site",
 		"south": "Lava Tube",
 		"west": null
 	},
