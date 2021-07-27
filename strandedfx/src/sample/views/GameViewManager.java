@@ -1,20 +1,14 @@
 package sample.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.game.conditions.Combat;
-import com.game.conditions.Travel;
-import com.game.conditions.Win;
 import com.game.enemies.Alien;
-import com.game.items.Item;
 import com.game.player.Player;
 
-import com.game.textparser.UserInput;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import com.game.startmenu.Status;
@@ -30,7 +24,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
@@ -48,7 +41,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import sample.GameController;
 import sample.MenuMain;
 import sample.models.*;
 
@@ -264,6 +256,7 @@ public class GameViewManager {
         }else{
             combatText.setText("");
         }
+
         locationText.setText(fxStatus.get("Location"));
 
         setMapImage(fxStatus.get("Location"));
@@ -366,8 +359,8 @@ public class GameViewManager {
 
             case "Crash Site":
                 map.setImage(new Image("sample/models/resources/maps/crashSite.png"));
-                background = new BackgroundImage(new Image("sample/views/resources/crashsite.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
-                                                 BackgroundPosition.DEFAULT,null);
+                background = new BackgroundImage(new Image("crashSite.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                                                 BackgroundPosition.DEFAULT, null);
                 map.setFitWidth(250);
                 map.setPreserveRatio(true);
                 map.setLayoutX(25);
@@ -432,7 +425,7 @@ public class GameViewManager {
                 break;
 
             case "Far East Crater":
-                background = new BackgroundImage(new Image("sample/models/resources/backs/farEastCrater.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                background = new BackgroundImage(new Image("sample/models/resources/backs/farEeastCrater.png"), BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
                                                  BackgroundPosition.DEFAULT,null);
                 map.setImage(new Image("sample/models/resources/maps/farEastCrater.png"));
                 map.setFitWidth(250);
@@ -684,7 +677,7 @@ public class GameViewManager {
 
     //method for backgorund
     private void createBackGround(){
-        Image mainBackImage = new Image("sample/views/resources/crashsite.png",1000,800,false,true);
+        Image mainBackImage = new Image("crashSite.png", 1000, 800, false, true);
         background = new BackgroundImage(mainBackImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
                                                          BackgroundPosition.DEFAULT,null);
 
@@ -955,7 +948,7 @@ public class GameViewManager {
                                    "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
                                    "You attacked with your fists. " +
                                    "" +
-                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are till alive" +
+                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are still alive" +
                                    "\n" +
                                    "------------------------------------------------");
             }
@@ -994,7 +987,7 @@ public class GameViewManager {
                                    "Name: " + "Matt Damon" + " | HP: " + hp + "|" + maxHp + "\n" +
                                    "You attacked with the first weapon in your inventory. " +
                                    "" +
-                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are till alive" +
+                                   "You Killed the alien and found out that they just revive and keep coming please leave while you are still alive" +
                                    "\n" +
                                    "------------------------------------------------");
             }
