@@ -891,7 +891,7 @@ public class GameViewManager {
     private Alien createAlien() throws IOException {
         //Return alien from JSON file.
         //byte[] alienData = Files.readAllBytes(Paths.get("src/main/resources/enemies.json"));
-        byte[] alienData = Files.readAllBytes(Paths.get("resources/enemies.json"));
+        byte[] alienData = Files.readAllBytes(Paths.get("src/resources/enemies.json"));
         ObjectMapper objectMapper = new ObjectMapper();
         Alien[] alien = objectMapper.readValue(alienData, Alien[].class);
 
